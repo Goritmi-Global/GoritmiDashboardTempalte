@@ -2,7 +2,7 @@
     <aside
         :class="[
             'transition-all duration-300',
-            sidebarOpen ? 'w-64' : 'w-0 overflow-hidden',
+            sidebarOpen ? 'w-72' : 'w-0 overflow-hidden',
         ]"
         class="bg-[#296FB6] text-white border-r border-gray-200"
     >
