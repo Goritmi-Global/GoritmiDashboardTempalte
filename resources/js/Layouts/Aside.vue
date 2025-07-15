@@ -21,18 +21,21 @@
         <nav class="p-4">
             <Link
                 href="/dashboard"
-                class="block py-2 px-4 rounded hover:bg-gray-100"
+                class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99]"
                 :class="{
-                    'text-blue-600 font-semibold': route().current('dashboard'),
+                    'bg-[#1f5b99] text-white font-semibold':
+                        route().current('dashboard'),
                 }"
-                >Dashboard</Link
             >
+                <HomeIcon class="w-5 h-5" />
+                Dashboard
+            </Link>
 
             <Link
                 href="/accounting"
-                class="block py-2 px-4 rounded hover:bg-gray-100"
+                class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99]"
                 :class="{
-                    'text-blue-600 font-semibold':
+                    'bg-[#1f5b99] text-white font-semibold':
                         route().current('accounting'),
                 }"
                 >Accounting</Link
@@ -40,18 +43,20 @@
 
             <Link
                 href="/crm"
-                class="block py-2 px-4 rounded hover:bg-gray-100"
+                class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99]"
                 :class="{
-                    'text-blue-600 font-semibold': route().current('crm'),
+                    'bg-[#1f5b99] text-white font-semibold':
+                        route().current('crm'),
                 }"
                 >CRM</Link
             >
 
             <Link
                 href="/hr"
-                class="block py-2 px-4 rounded hover:bg-gray-100"
+                class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99]"
                 :class="{
-                    'text-blue-600 font-semibold': route().current('hr'),
+                    'bg-[#1f5b99] text-white font-semibold':
+                        route().current('hr'),
                 }"
                 >HR</Link
             >
@@ -60,8 +65,11 @@
             <div>
                 <button
                     @click="projectsOpen = !projectsOpen"
-                    class="flex justify-between w-full py-2 px-4 rounded hover:bg-gray-100 text-left"
-                    :class="{ 'text-blue-600 font-semibold': isProjectActive }"
+                    class="flex justify-between w-full py-2 px-4 rounded hover:bg-[#1f5b99] text-left"
+                    :class="{
+                        'bg-[#1f5b99] text-white font-semibold':
+                            isProjectActive,
+                    }"
                 >
                     <span>Projects</span>
                     <svg
@@ -87,9 +95,9 @@
                 >
                     <Link
                         href="/projects/new"
-                        class="block py-2 px-4 rounded hover:bg-gray-100 text-sm"
+                        class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99] text-sm"
                         :class="{
-                            'text-blue-600 font-semibold':
+                            'bg-[#1f5b99] text-white font-semibold':
                                 route().current('projects.new'),
                         }"
                         >New Projects</Link
@@ -97,9 +105,9 @@
 
                     <Link
                         href="/projects/existing"
-                        class="block py-2 px-4 rounded hover:bg-gray-100 text-sm"
+                        class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99] text-sm"
                         :class="{
-                            'text-blue-600 font-semibold':
+                            'bg-[#1f5b99] text-white font-semibold':
                                 route().current('projects.existing'),
                         }"
                         >Existing Projects</Link
@@ -107,9 +115,9 @@
 
                     <Link
                         href="/projects/dealing"
-                        class="block py-2 px-4 rounded hover:bg-gray-100 text-sm"
+                        class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99] text-sm"
                         :class="{
-                            'text-blue-600 font-semibold':
+                            'bg-[#1f5b99] text-white font-semibold':
                                 route().current('projects.dealing'),
                         }"
                         >Dealing Projects</Link
@@ -121,10 +129,19 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { computed, ref } from "vue";
 import { Link } from "@inertiajs/vue3";
+import {
+    HomeIcon,
+    BanknotesIcon,
+    UsersIcon,
+    BriefcaseIcon,
+    FolderIcon,
+} from "@heroicons/vue/24/outline";
 
-const sidebarOpen = ref(true);
+const props = defineProps({
+    sidebarOpen: Boolean,
+});
 
 const projectsOpen = ref(
     route().current("projects.new") ||

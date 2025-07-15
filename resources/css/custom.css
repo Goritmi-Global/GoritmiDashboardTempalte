@@ -1,0 +1,14 @@
+/* custom.css */
+.sidebar-link {
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background-color: #1f5b99 !important;
+}
+
+.sidebar-link-active {
+  background-color: #1f5b99 !important;
+  color: white !important;
+  font-weight: 600;
+}
