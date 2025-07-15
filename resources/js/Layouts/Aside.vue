@@ -18,10 +18,10 @@
         </div>
 
         <!-- Navigation -->
-        <nav class="p-4">
+        <nav class="py-6">
             <Link
                 href="/dashboard"
-                class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99]"
+                class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99]"
                 :class="{
                     'bg-[#1f5b99] text-white font-semibold':
                         route().current('dashboard'),
@@ -33,7 +33,7 @@
 
             <Link
                 href="/accounting"
-                class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99]"
+                class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99]"
                 :class="{
                     'bg-[#1f5b99] text-white font-semibold':
                         route().current('accounting'),
@@ -43,7 +43,7 @@
 
             <Link
                 href="/crm"
-                class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99]"
+                class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99]"
                 :class="{
                     'bg-[#1f5b99] text-white font-semibold':
                         route().current('crm'),
@@ -55,7 +55,7 @@
             <div>
                 <button
                     @click="projectsOpen = !projectsOpen"
-                    class="flex justify-between w-full py-2 px-4 rounded hover:bg-[#1f5b99] text-left"
+                    class="flex justify-between w-full py-2 px-6 hover:bg-[#1f5b99] text-left"
                     :class="{
                         'bg-[#1f5b99] text-white font-semibold':
                             isProjectActive,
@@ -74,11 +74,11 @@
                 <Transition name="sidebar-dropdown">
                     <div
                         v-show="projectsOpen"
-                        class="space-y-1 rounded bg-[#296FB6] text-white transition-all"
+                        class="space-y-1 bg-[#296FB6] text-white transition-all"
                     >
                         <Link
                             href="/projects/new"
-                            class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99] text-sm"
+                            class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99] text-sm"
                             :class="{
                                 'bg-[#1f5b99] font-semibold':
                                     route().current('projects.new'),
@@ -89,7 +89,7 @@
 
                         <Link
                             href="/projects/existing"
-                            class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99] text-sm"
+                            class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99] text-sm"
                             :class="{
                                 'bg-[#1f5b99] font-semibold':
                                     route().current('projects.existing'),
@@ -100,7 +100,7 @@
 
                         <Link
                             href="/projects/dealing"
-                            class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99] text-sm"
+                            class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99] text-sm"
                             :class="{
                                 'bg-[#1f5b99] font-semibold':
                                     route().current('projects.dealing'),
@@ -114,7 +114,7 @@
 
             <Link
                 href="/hr"
-                class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99]"
+                class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99]"
                 :class="{
                     'bg-[#1f5b99] text-white font-semibold':
                         route().current('hr'),
