@@ -1,14 +1,40 @@
 /* custom.css */
 .sidebar-link {
-  transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease;
 }
 
 .sidebar-link:hover {
-  background-color: #1f5b99 !important;
+    background-color: #1f5b99 !important;
 }
 
 .sidebar-link-active {
-  background-color: #1f5b99 !important;
-  color: white !important;
-  font-weight: 600;
+    background-color: #1f5b99 !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+/* Sidebar dropdown transition */
+.sidebar-dropdown {
+    transition: all 0.3s ease;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+}
+
+.sidebar-dropdown-enter-active,
+.sidebar-dropdown-leave-active {
+    transition: all 0.3s ease;
+}
+
+.sidebar-dropdown-enter-from,
+.sidebar-dropdown-leave-to {
+    opacity: 0;
+    max-height: 0;
+}
+
+.sidebar-dropdown-enter-to,
+.sidebar-dropdown-leave-from {
+    opacity: 1;
+    max-height: 500px;
+    /* large enough to handle content */
 }

@@ -51,16 +51,6 @@
                 ><UserGroupIcon class="w-5 h-5" />CRM</Link
             >
 
-            <Link
-                href="/hr"
-                class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99]"
-                :class="{
-                    'bg-[#1f5b99] text-white font-semibold':
-                        route().current('hr'),
-                }"
-                ><BriefcaseIcon class="w-5 h-5" />HR</Link
-            >
-
             <!-- Projects Dropdown -->
             <div>
                 <button
@@ -81,44 +71,56 @@
                     />
                 </button>
 
-                <div
-                    v-show="projectsOpen"
-                    class="pl-6 mt-1 space-y-1 transition-all"
-                >
-                    <Link
-                        href="/projects/new"
-                        class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99] text-sm"
-                        :class="{
-                            'bg-[#1f5b99] text-white font-semibold':
-                                route().current('projects.new'),
-                        }"
-                        ><PlusIcon class="w-5 h-5" />New Projects</Link
+                <Transition name="sidebar-dropdown">
+                    <div
+                        v-show="projectsOpen"
+                        class="space-y-1 rounded bg-[#296FB6] text-white transition-all"
                     >
+                        <Link
+                            href="/projects/new"
+                            class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99] text-sm"
+                            :class="{
+                                'bg-[#1f5b99] font-semibold':
+                                    route().current('projects.new'),
+                            }"
+                        >
+                            <PlusIcon class="w-5 h-5" />New Projects
+                        </Link>
 
-                    <Link
-                        href="/projects/existing"
-                        class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99] text-sm"
-                        :class="{
-                            'bg-[#1f5b99] text-white font-semibold':
-                                route().current('projects.existing'),
-                        }"
-                    >
-                        <DocumentIcon class="w-5 h-5" />Existing Projects</Link
-                    >
+                        <Link
+                            href="/projects/existing"
+                            class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99] text-sm"
+                            :class="{
+                                'bg-[#1f5b99] font-semibold':
+                                    route().current('projects.existing'),
+                            }"
+                        >
+                            <BriefcaseIcon class="w-5 h-5" />Existing Projects
+                        </Link>
 
-                    <Link
-                        href="/projects/dealing"
-                        class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99] text-sm"
-                        :class="{
-                            'bg-[#1f5b99] text-white font-semibold':
-                                route().current('projects.dealing'),
-                        }"
-                    >
-                        <HandThumbUpIcon class="w-5 h-5" />Dealing
-                        Projects</Link
-                    >
-                </div>
+                        <Link
+                            href="/projects/dealing"
+                            class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99] text-sm"
+                            :class="{
+                                'bg-[#1f5b99] font-semibold':
+                                    route().current('projects.dealing'),
+                            }"
+                        >
+                            <HandThumbUpIcon class="w-5 h-5" />Dealing Projects
+                        </Link>
+                    </div>
+                </Transition>
             </div>
+
+            <Link
+                href="/hr"
+                class="flex items-center gap-2 py-2 px-4 rounded transition hover:bg-[#1f5b99]"
+                :class="{
+                    'bg-[#1f5b99] text-white font-semibold':
+                        route().current('hr'),
+                }"
+                ><DocumentIcon class="w-5 h-5" />HR</Link
+            >
         </nav>
     </aside>
 </template>
