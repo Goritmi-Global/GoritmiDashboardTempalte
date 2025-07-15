@@ -183,6 +183,60 @@ onMounted(() => {
         },
     });
 });
+
+const ratingCounts = {
+    5: 384,
+    4: 145,
+    3: 24,
+    2: 1,
+    1: 0,
+};
+
+const ratingWidths = {
+    5: 76,
+    4: 45,
+    3: 18,
+    2: 4,
+    1: 0,
+};
+
+const recentEmployees = [
+    {
+        name: "Isabella Christensen",
+        desc: "Lorem Ipsum is simply dummy text of...",
+        date: "11 MAY 12:56",
+        online: true,
+        avatar: "https://i.pravatar.cc/40?img=1",
+    },
+    {
+        name: "Mathilde Andersen",
+        desc: "Lorem Ipsum is simply dummy text of...",
+        date: "11 MAY 10:35",
+        online: false,
+        avatar: "https://i.pravatar.cc/40?img=2",
+    },
+    {
+        name: "Karla Sorensen",
+        desc: "Lorem Ipsum is simply dummy text of...",
+        date: "9 MAY 17:38",
+        online: true,
+        avatar: "https://i.pravatar.cc/40?img=3",
+    },
+    {
+        name: "Ida Jorgensen",
+        desc: "Lorem Ipsum is simply dummy text of...",
+        date: "19 MAY 12:56",
+        online: false,
+        avatar: "https://i.pravatar.cc/40?img=4",
+    },
+    {
+        name: "Albert Andersen",
+        desc: "Lorem Ipsum is simply dummy text of...",
+        date: "21 JULY 12:56",
+        online: true,
+        avatar: "https://i.pravatar.cc/40?img=5",
+    },
+];
 </script>
 
 <template>
@@ -290,6 +344,102 @@ onMounted(() => {
                 <div class="bg-white shadow rounded-lg p-4">
                     <h2 class="text-lg font-semibold mb-4">Device Usage</h2>
                     <canvas ref="doughnutChartRef" height="250"></canvas>
+                </div>
+            </div>
+
+            <!-- Employees Records -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <!-- Ratings Box -->
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h2 class="text-lg font-semibold mb-4">Rating</h2>
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="text-5xl font-bold">
+                            4.7 <span class="text-yellow-400">★</span>
+                        </div>
+                        <div
+                            class="text-sm text-green-500 font-semibold flex items-center gap-1"
+                        >
+                            0.4 <span>▲</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div
+                            v-for="star in [5, 4, 3, 2, 1]"
+                            :key="star"
+                            class="flex items-center gap-2"
+                        >
+                            <span class="w-4 text-yellow-400 text-sm">★</span>
+                            <span class="w-6 text-sm text-gray-700">{{
+                                star
+                            }}</span>
+                            <div
+                                class="w-full bg-gray-200 rounded-full h-2 shadow-inner"
+                            >
+                                <div
+                                    class="h-2 rounded-full bg-teal-400"
+                                    :style="{ width: ratingWidths[star] + '%' }"
+                                ></div>
+                            </div>
+                            <span
+                                class="text-sm text-gray-600 w-10 text-right"
+                                >{{ ratingCounts[star] }}</span
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Employees Box -->
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h2 class="text-lg font-semibold mb-4">Employees</h2>
+                    <ul class="divide-y divide-gray-100">
+                        <li
+                            v-for="(user, index) in recentEmployees"
+                            :key="index"
+                            class="py-4 flex items-center justify-between"
+                        >
+                            <div class="flex items-center gap-3">
+                                <img
+                                    :src="user.avatar"
+                                    alt="avatar"
+                                    class="w-10 h-10 rounded-full"
+                                />
+                                <div>
+                                    <p class="font-semibold text-gray-800">
+                                        {{ user.name }}
+                                    </p>
+                                    <p
+                                        class="text-sm text-gray-500 truncate max-w-[200px]"
+                                    >
+                                        {{ user.desc }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span
+                                    class="w-2 h-2 rounded-full"
+                                    :class="
+                                        user.online
+                                            ? 'bg-green-500'
+                                            : 'bg-red-500'
+                                    "
+                                ></span>
+                                <span class="text-sm text-gray-500">{{
+                                    user.date
+                                }}</span>
+                                <button
+                                    class="bg-purple-200 text-purple-800 px-3 py-1 rounded-full text-xs"
+                                >
+                                    Reject
+                                </button>
+                                <button
+                                    class="bg-teal-400 text-white px-3 py-1 rounded-full text-xs"
+                                >
+                                    Approve
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
