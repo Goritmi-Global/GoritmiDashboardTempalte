@@ -350,7 +350,7 @@ const recentEmployees = [
             <!-- Employees Records -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                 <!-- Rating Box -->
-                <div class="bg-white rounded-xl shadow p-6">
+                <div class="bg-white shadow p-6">
                     <h2 class="text-lg font-semibold mb-4">Rating</h2>
                     <div class="flex items-center justify-between mb-6">
                         <div class="text-5xl font-bold">
@@ -390,7 +390,7 @@ const recentEmployees = [
                 </div>
 
                 <!-- Employees Table -->
-                <div class="bg-white rounded-xl shadow p-6 overflow-x-auto">
+                <div class="bg-white shadow p-6 overflow-x-auto">
                     <h2 class="text-lg font-semibold mb-4">
                         Employees Records
                     </h2>
