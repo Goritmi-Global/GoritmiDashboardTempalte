@@ -21,6 +21,7 @@
                     />
                 </svg>
             </button>
+            
             <h1 class="text-lg font-semibold">
                 {{ $page.component.split("/").pop() }}
             </h1>

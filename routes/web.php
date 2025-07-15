@@ -29,7 +29,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/crm', [GlobalPageController::class, 'crm'])->name('crm');
     Route::get('/hr', [GlobalPageController::class, 'hr'])->name('hr');
     Route::get('/projects', [GlobalPageController::class, 'projects'])->name('projects'); 
+    Route::get('/projects/new', [GlobalPageController::class, 'projects'])->name('projects.new'); 
+    Route::get('/projects/existing', [GlobalPageController::class, 'projects'])->name('projects.existing'); 
+    Route::get('/projects/dealing', [GlobalPageController::class, 'projects'])->name('projects.dealing'); 
 
+     
 });
 
 require __DIR__.'/auth.php';
