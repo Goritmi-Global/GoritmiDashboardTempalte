@@ -19,109 +19,95 @@
 
         <!-- Navigation -->
         <nav class="py-6">
-            <Link
-                href="/dashboard"
-                class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99]"
-                :class="{
-                    'bg-[#1f5b99] text-white font-semibold':
-                        route().current('dashboard'),
-                }"
-            >
-                <HomeIcon class="w-5 h-5" />
-                Dashboard
-            </Link>
+    <Link
+        href="/dashboard"
+        class="sidebar-link"
+        :class="{ 'sidebar-link-active': route().current('dashboard') }"
+    >
+        <HomeIcon class="w-5 h-5" />
+        Dashboard
+    </Link>
 
-            <Link
-                href="/accounting"
-                class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99]"
-                :class="{
-                    'bg-[#1f5b99] text-white font-semibold':
-                        route().current('accounting'),
-                }"
-                ><BanknotesIcon class="w-5 h-5" />Accounting</Link
-            >
+    <Link
+        href="/accounting"
+        class="sidebar-link"
+        :class="{ 'sidebar-link-active': route().current('accounting') }"
+    >
+        <BanknotesIcon class="w-5 h-5" />
+        Accounting
+    </Link>
 
-            <Link
-                href="/crm"
-                class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99]"
-                :class="{
-                    'bg-[#1f5b99] text-white font-semibold':
-                        route().current('crm'),
-                }"
-                ><UserGroupIcon class="w-5 h-5" />CRM</Link
-            >
+    <Link
+        href="/crm"
+        class="sidebar-link"
+        :class="{ 'sidebar-link-active': route().current('crm') }"
+    >
+        <UserGroupIcon class="w-5 h-5" />
+        CRM
+    </Link>
 
-            <!-- Projects Dropdown -->
-            <div>
-                <button
-                    @click="projectsOpen = !projectsOpen"
-                    class="flex justify-between w-full py-2 px-6 hover:bg-[#1f5b99] text-left"
-                    :class="{
-                        'bg-[#1f5b99] text-white font-semibold':
-                            isProjectActive,
-                    }"
+    <!-- Projects Dropdown -->
+    <div>
+        <button
+            @click="projectsOpen = !projectsOpen"
+            class="sidebar-link justify-between text-left"
+            :class="{ 'sidebar-link-active': isProjectActive }"
+        >
+            <span class="flex items-center gap-2">
+                <FolderIcon class="w-5 h-5" />
+                Projects
+            </span>
+            <ChevronDownIcon
+                class="w-4 h-4 transition-transform"
+                :class="{ 'rotate-180': projectsOpen }"
+            />
+        </button>
+
+        <Transition name="sidebar-dropdown">
+            <div
+                v-show="projectsOpen"
+                class="space-y-1 bg-[#296FB6] transition-all"
+            >
+                <Link
+                    href="/projects/new"
+                    class="sidebar-link text-sm"
+                    :class="{ 'sidebar-link-active': route().current('projects.new') }"
                 >
-                    <span class="flex items-center gap-2">
-                        <FolderIcon class="w-5 h-5" />
-                        Projects
-                    </span>
-                    <ChevronDownIcon
-                        class="w-4 h-4 transition-transform"
-                        :class="{ 'rotate-180': projectsOpen }"
-                    />
-                </button>
+                    <PlusIcon class="w-5 h-5" />
+                    New Projects
+                </Link>
 
-                <Transition name="sidebar-dropdown">
-                    <div
-                        v-show="projectsOpen"
-                        class="space-y-1 bg-[#296FB6] text-white transition-all"
-                    >
-                        <Link
-                            href="/projects/new"
-                            class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99] text-sm"
-                            :class="{
-                                'bg-[#1f5b99] font-semibold':
-                                    route().current('projects.new'),
-                            }"
-                        >
-                            <PlusIcon class="w-5 h-5" />New Projects
-                        </Link>
+                <Link
+                    href="/projects/existing"
+                    class="sidebar-link text-sm"
+                    :class="{ 'sidebar-link-active': route().current('projects.existing') }"
+                >
+                    <BriefcaseIcon class="w-5 h-5" />
+                    Existing Projects
+                </Link>
 
-                        <Link
-                            href="/projects/existing"
-                            class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99] text-sm"
-                            :class="{
-                                'bg-[#1f5b99] font-semibold':
-                                    route().current('projects.existing'),
-                            }"
-                        >
-                            <BriefcaseIcon class="w-5 h-5" />Existing Projects
-                        </Link>
-
-                        <Link
-                            href="/projects/dealing"
-                            class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99] text-sm"
-                            :class="{
-                                'bg-[#1f5b99] font-semibold':
-                                    route().current('projects.dealing'),
-                            }"
-                        >
-                            <HandThumbUpIcon class="w-5 h-5" />Dealing Projects
-                        </Link>
-                    </div>
-                </Transition>
+                <Link
+                    href="/projects/dealing"
+                    class="sidebar-link text-sm"
+                    :class="{ 'sidebar-link-active': route().current('projects.dealing') }"
+                >
+                    <HandThumbUpIcon class="w-5 h-5" />
+                    Dealing Projects
+                </Link>
             </div>
+        </Transition>
+    </div>
 
-            <Link
-                href="/hr"
-                class="flex items-center gap-2 py-2 px-6 transition hover:bg-[#1f5b99]"
-                :class="{
-                    'bg-[#1f5b99] text-white font-semibold':
-                        route().current('hr'),
-                }"
-                ><DocumentIcon class="w-5 h-5" />HR</Link
-            >
-        </nav>
+    <Link
+        href="/hr"
+        class="sidebar-link"
+        :class="{ 'sidebar-link-active': route().current('hr') }"
+    >
+        <DocumentIcon class="w-5 h-5" />
+        HR
+    </Link>
+</nav>
+
     </aside>
 </template>
 

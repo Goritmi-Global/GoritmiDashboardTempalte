@@ -1,19 +1,33 @@
-/* custom.css */
+/* Sidebar Link Base */
 .sidebar-link {
-    transition: background-color 0.2s ease;
+    display: block;
+    width: 100%;
+    padding: 0.5rem 1.5rem;
+    /* Left and right spacing */
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Hover Effect with Depth */
 .sidebar-link:hover {
-    background-color: #1f5b99 !important;
-}
-
-.sidebar-link-active {
-    background-color: #1f5b99 !important;
-    color: white !important;
+    background-color: white !important;
+    color: #1f5b99 !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    /* Light press */
     font-weight: 600;
 }
 
-/* Sidebar dropdown transition */
+/* Active Link State */
+.sidebar-link-active {
+    background-color: white !important;
+    color: #1f5b99 !important;
+    font-weight: 600;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+    /* Deeper press */
+}
+
+/* Sidebar Dropdown Transition */
 .sidebar-dropdown {
     transition: all 0.3s ease;
     opacity: 0;
@@ -36,5 +50,17 @@
 .sidebar-dropdown-leave-from {
     opacity: 1;
     max-height: 500px;
-    /* large enough to handle content */
+    /* Adjust as needed */
+}
+
+/* Sidebar link base style */
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    width: 100%;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
