@@ -323,25 +323,25 @@ const recentEmployees = [
             <!-- Charts Row -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                 <!-- Bar Chart -->
-                <div class="bg-white shadow rounded-lg p-4">
+                <div class="bg-white shadow p-4">
                     <h2 class="text-lg font-semibold mb-4">Monthly Sales</h2>
                     <canvas ref="barChartRef" height="250"></canvas>
                 </div>
 
                 <!-- Pie Chart -->
-                <div class="bg-white shadow rounded-lg p-4">
+                <div class="bg-white shadow p-4">
                     <h2 class="text-lg font-semibold mb-4">Status Breakdown</h2>
                     <canvas ref="pieChartRef" height="250"></canvas>
                 </div>
 
                 <!-- Line Chart -->
-                <div class="bg-white shadow rounded-lg p-4">
+                <div class="bg-white shadow p-4">
                     <h2 class="text-lg font-semibold mb-4">Visitors Trend</h2>
                     <canvas ref="lineChartRef" height="250"></canvas>
                 </div>
 
                 <!-- Doughnut Chart -->
-                <div class="bg-white shadow rounded-lg p-4">
+                <div class="bg-white shadow p-4">
                     <h2 class="text-lg font-semibold mb-4">Device Usage</h2>
                     <canvas ref="doughnutChartRef" height="250"></canvas>
                 </div>
@@ -349,7 +349,7 @@ const recentEmployees = [
 
             <!-- Employees Records -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <!-- Ratings Box -->
+                <!-- Rating Box -->
                 <div class="bg-white rounded-xl shadow p-6">
                     <h2 class="text-lg font-semibold mb-4">Rating</h2>
                     <div class="flex items-center justify-between mb-6">
@@ -389,57 +389,71 @@ const recentEmployees = [
                     </div>
                 </div>
 
-                <!-- Recent Employees Box -->
-                <div class="bg-white rounded-xl shadow p-6">
-                    <h2 class="text-lg font-semibold mb-4">Employees</h2>
-                    <ul class="divide-y divide-gray-100">
-                        <li
-                            v-for="(user, index) in recentEmployees"
-                            :key="index"
-                            class="py-4 flex items-center justify-between"
-                        >
-                            <div class="flex items-center gap-3">
-                                <img
-                                    :src="user.avatar"
-                                    alt="avatar"
-                                    class="w-10 h-10 rounded-full"
-                                />
-                                <div>
-                                    <p class="font-semibold text-gray-800">
-                                        {{ user.name }}
-                                    </p>
-                                    <p
-                                        class="text-sm text-gray-500 truncate max-w-[200px]"
+                <!-- Employees Table -->
+                <div class="bg-white rounded-xl shadow p-6 overflow-x-auto">
+                    <h2 class="text-lg font-semibold mb-4">
+                        Employees Records
+                    </h2>
+                    <table class="w-full text-left text-sm text-gray-700">
+                        <thead>
+                            <tr class="border-b text-gray-500">
+                                <th class="pb-2">Employee</th>
+                                <th class="pb-2">Status</th>
+                                <th class="pb-2">Date</th>
+                                <th class="pb-2 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="(emp, index) in recentEmployees"
+                                :key="index"
+                                class="border-b last:border-0 hover:bg-gray-50"
+                            >
+                                <td class="py-3">
+                                    <div class="flex items-center gap-3">
+                                        <img
+                                            :src="emp.avatar"
+                                            class="w-10 h-10 rounded-full"
+                                            alt="avatar"
+                                        />
+                                        <div>
+                                            <p class="font-semibold">
+                                                {{ emp.name }}
+                                            </p>
+                                            <p
+                                                class="text-xs text-gray-500 truncate max-w-[200px]"
+                                            >
+                                                {{ emp.desc }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span
+                                        class="inline-block w-3 h-3 rounded-full"
+                                        :class="
+                                            emp.online
+                                                ? 'bg-green-500'
+                                                : 'bg-red-500'
+                                        "
+                                    ></span>
+                                </td>
+                                <td>{{ emp.date }}</td>
+                                <td class="text-right">
+                                    <button
+                                        class="bg-purple-200 text-purple-800 px-3 py-1 rounded-full text-xs mr-2"
                                     >
-                                        {{ user.desc }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span
-                                    class="w-2 h-2 rounded-full"
-                                    :class="
-                                        user.online
-                                            ? 'bg-green-500'
-                                            : 'bg-red-500'
-                                    "
-                                ></span>
-                                <span class="text-sm text-gray-500">{{
-                                    user.date
-                                }}</span>
-                                <button
-                                    class="bg-purple-200 text-purple-800 px-3 py-1 rounded-full text-xs"
-                                >
-                                    Reject
-                                </button>
-                                <button
-                                    class="bg-teal-400 text-white px-3 py-1 rounded-full text-xs"
-                                >
-                                    Approve
-                                </button>
-                            </div>
-                        </li>
-                    </ul>
+                                        Reject
+                                    </button>
+                                    <button
+                                        class="bg-teal-400 text-white px-3 py-1 rounded-full text-xs"
+                                    >
+                                        Approve
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
