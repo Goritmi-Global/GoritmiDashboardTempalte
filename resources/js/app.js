@@ -1,6 +1,6 @@
 import '../css/app.css';
 import './bootstrap';
-
+import "vue-multiselect/dist/vue-multiselect.css";
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';

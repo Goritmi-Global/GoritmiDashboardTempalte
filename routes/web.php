@@ -25,14 +25,20 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/dashboard', [GlobalPageController::class, 'dashboard'])->name('dashboard');
-    Route::get('/accounting', [GlobalPageController::class, 'accounting'])->name('accounting');
     Route::get('/crm', [GlobalPageController::class, 'crm'])->name('crm');
     Route::get('/hr', [GlobalPageController::class, 'hr'])->name('hr');
     Route::get('/projects', [GlobalPageController::class, 'projects'])->name('projects'); 
     Route::get('/projects/new', [GlobalPageController::class, 'projects'])->name('projects.new'); 
     Route::get('/projects/existing', [GlobalPageController::class, 'projects'])->name('projects.existing'); 
     Route::get('/projects/dealing', [GlobalPageController::class, 'projects'])->name('projects.dealing'); 
-
+    
+    // Accounting Routes
+    Route::get('/accounting/create', [GlobalPageController::class, 'createAccounting'])->name('accounting.create');
+    Route::post('/accounting/store', [GlobalPageController::class, 'storeAccounting'])->name('accounting.store');
+    Route::get('/accounting/show/{id}', [GlobalPageController::class, 'showAccounting'])->name('accounting.show');
+    Route::delete('/accounting/delete/{id}', [GlobalPageController::class, 'deleteAccounting'])->name('accounting.delete');
+ 
+    Route::get('/accounting', [GlobalPageController::class, 'accounting'])->name('accounting');
      
 });
 

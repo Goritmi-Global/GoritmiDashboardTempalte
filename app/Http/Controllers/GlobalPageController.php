@@ -16,6 +16,10 @@ class GlobalPageController extends Controller
     {
         return Inertia::render('Accounting/Index');
     }
+    public function createAccounting()
+    {
+        return Inertia::render('Accounting/Create');
+    }
 
     public function crm()
     {
