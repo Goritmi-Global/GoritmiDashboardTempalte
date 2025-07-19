@@ -1,7 +1,10 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
+import axios from "axios";
 import { ref, computed } from "vue";
+import { toast } from "vue3-toastify";
+import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
     users: Object,
@@ -14,13 +17,18 @@ const selectedRoles = ref([]);
 
 const toggleFilter = () => (showFilter.value = !showFilter.value);
 
-const deleteUser = (user) => {
-    if (confirm(`Are you sure you want to delete ${user.name}?`)) {
-        alert(`Simulated delete for ${user.name}`); // simulate
+const deleteUser = async (user) => {
+    try {
+        await axios.delete(`/users/${user.id}`);
+        toast.success(`${user.name} deleted successfully`);
+
+        router.reload();
+    } catch (error) {
+        toast.error("Failed to delete user."); 
     }
 };
 
-const isAdmin = (user) => user.roles.some((role) => role.name === "admin");
+const isAdmin = (user) => user.roles.some((role) => role.name === "Admin");
 
 const filteredUsers = computed(() => {
     return props.users.data.filter((user) => {
@@ -35,6 +43,18 @@ const filteredUsers = computed(() => {
         return matchesSearch && matchesRole;
     });
 });
+
+const showModal = ref(false);
+const userToDelete = ref(null);
+const askDelete = (user) => {
+    userToDelete.value = user;
+    showModal.value = true;
+};
+
+const confirmDelete = () => {
+    axios.delete(`/users/${userToDelete.value.id}`);
+    showModal.value = false;
+};
 </script>
 
 <template>
@@ -87,23 +107,7 @@ const filteredUsers = computed(() => {
                     </nav>
                 </div>
 
-                <Link
-                    href="/users/create"
-                    class="flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-blue-600 hover:bg-blue-700"
-                >
-                    <svg
-                        class="h-4 w-4 mr-2"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                    >
-                        <path
-                            clip-rule="evenodd"
-                            fill-rule="evenodd"
-                            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                        />
-                    </svg>
-                    Add New User
-                </Link>
+                <PrimaryLinkButton href="/users/create" label="Add New User" />
             </div>
 
             <div class="bg-white shadow-sm rounded-lg overflow-hidden">
@@ -220,24 +224,49 @@ const filteredUsers = computed(() => {
                                     {{ role.name }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-center space-x-2">
-                                <a
-                                    :href="`/users/${user.id}/edit`"
-                                    class="text-sm text-blue-600 hover:underline"
-                                    >Edit</a
+                            <td class="px-4 py-3 text-center">
+                                <div
+                                    class="flex items-center justify-center gap-2"
                                 >
-                                <button
-                                    v-if="!isAdmin(user)"
-                                    @click="deleteUser(user)"
-                                    class="text-sm text-red-600 hover:underline"
-                                >
-                                    Delete
-                                </button>
-                                <span
-                                    v-else
-                                    class="text-xs text-gray-400 italic"
-                                    >(admin protected)</span
-                                >
+                                    <!-- Edit Button (use <Link> instead of <a>) -->
+                                    <Link
+                                        :href="`/users/${user.id}/edit`"
+                                        class="inline-flex items-center justify-center p-2.5 rounded-full text-blue-600 hover:bg-blue-100"
+                                        title="Edit"
+                                    >
+                                        <svg
+                                            class="w-5 h-5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M15.232 5.232l3.536 3.536M4 20h4.586a1 1 0 00.707-.293l10.414-10.414a1 1 0 000-1.414l-3.536-3.536a1 1 0 00-1.414 0L4.343 14.343A1 1 0 004 15.05V20z"
+                                            />
+                                        </svg>
+                                    </Link>
+
+                                    <!-- Delete Button inside ConfirmModal -->
+                                    <ConfirmModal
+                                        v-if="!isAdmin(user)"
+                                        :title="'Confirm Delete'"
+                                        :message="`Are you sure you want to delete ${user.name}?`"
+                                        :showDeleteButton="true"
+                                        @confirm="() => deleteUser(user)"
+                                        @cancel="() => {}"
+                                    />
+
+                                    <!-- Admin Protected -->
+                                    <span
+                                        v-else
+                                        class="text-xs text-gray-400 italic"
+                                    >
+                                        (admin protected)
+                                    </span>
+                                </div>
                             </td>
                         </tr>
                     </tbody>

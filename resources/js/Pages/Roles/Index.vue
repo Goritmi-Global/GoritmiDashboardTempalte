@@ -1,6 +1,7 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { Head, Link, router } from '@inertiajs/vue3'
+import { Plus, KeyRound } from 'lucide-vue-next';
 import { ref } from 'vue'
 
 const props = defineProps({
@@ -25,20 +26,19 @@ const deletePermission = (id) => {
       <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold">Roles & Permissions</h1>
         <div class="flex gap-2">
-          <Link
-            v-if="activeTab === 'roles'"
-            href="/roles/create"
-            class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
-          >
-            + Add Role
-          </Link>
-          <Link
-            v-if="activeTab === 'permissions'"
-            href="/permissions/create"
-            class="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700"
-          >
-            + Add Permission
-          </Link>
+
+          <PrimaryLinkButton v-if="activeTab === 'roles'" href="/roles/create" label="Add Role">
+  <template #icon>
+    <Plus class="w-4 h-4" />
+  </template>
+</PrimaryLinkButton>
+
+<PrimaryLinkButton v-if="activeTab === 'permissions'" href="/permissions/create" label="Add Permission">
+  <template #icon>
+    <KeyRound class="w-4 h-4" />
+  </template>
+</PrimaryLinkButton>
+
         </div>
       </div>
 
@@ -57,7 +57,7 @@ const deletePermission = (id) => {
           @click="activeTab = 'permissions'"
           :class="[
             'px-4 py-2 text-sm font-medium border-b-2',
-            activeTab === 'permissions' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500'
+            activeTab === 'permissions' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'
           ]"
         >
           Permissions
@@ -81,7 +81,7 @@ const deletePermission = (id) => {
                 <span
                   v-for="perm in role.permissions"
                   :key="perm.id"
-                  class="inline-block bg-green-100 text-green-800 text-xs font-medium mr-1 px-2.5 py-0.5 rounded"
+                  class="inline-block bg-blue-100 text-blue-800 text-xs font-medium mr-1 px-2.5 py-0.5 rounded"
                 >
                   {{ perm.name }}
                 </span>

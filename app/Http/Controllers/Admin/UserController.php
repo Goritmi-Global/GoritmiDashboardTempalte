@@ -97,28 +97,32 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        
+        $user->delete();
+
+        return 'success';
     }
 
-    public function editRoles(User $user)
-    {
-        $roles = Role::all();
-        return Inertia::render('Admin/Users/EditRoles', [
-            'user' => $user,
-            'roles' => $roles,
-            'userRoles' => $user->roles->pluck('name'),
-        ]);
-    }
-    public function updateRoles(Request $request, User $user)
-    {
-        $validated = $request->validate([
-            'roles' => 'array'
-        ]);
+    // public function editRoles(User $user)
+    // {
+    //     $roles = Role::all();
+    //     return Inertia::render('Admin/Users/EditRoles', [
+    //         'user' => $user,
+    //         'roles' => $roles,
+    //         'userRoles' => $user->roles->pluck('name'),
+    //     ]);
+    // }
+    // public function updateRoles(Request $request, User $user)
+    // {
+    //     $validated = $request->validate([
+    //         'roles' => 'array'
+    //     ]);
 
-        $user->syncRoles($validated['roles']);
+    //     $user->syncRoles($validated['roles']);
 
-        return redirect()->route('users.index')->with('success', 'Roles updated');
-    }
+    //     return redirect()->route('users.index')->with('success', 'Roles updated');
+    // }
 
 
 }
