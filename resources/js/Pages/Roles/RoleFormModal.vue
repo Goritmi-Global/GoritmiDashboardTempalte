@@ -9,8 +9,7 @@ const props = defineProps({
   role: Object,
   permissions: Array,
 });
-
-console.log('permissions:', props.permissions);
+ 
 const emit = defineEmits(['close', 'submitted']);
 const isEdit = ref(!!props.role);
 const form = useForm({

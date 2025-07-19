@@ -47,9 +47,18 @@ class PermissionController extends Controller
         return redirect()->route('roles-permissions')->with('success', 'Permission updated.');
     }
 
-    public function destroy(Permission $permission)
-    {
-        $permission->delete();
-        return redirect()->route('permissions.index')->with('success', 'Permission deleted.');
+   public function destroy(Permission $permission)
+{
+    if ($permission->roles()->count() > 0) {
+        return response()->json([
+            'message' => 'Cannot delete permission: it is assigned to one or more roles.',
+        ], 422); // 422 for validation-type error
     }
+
+    $permission->delete();
+
+    return response()->json(['message' => 'Permission deleted successfully.']);
+}
+
+
 }

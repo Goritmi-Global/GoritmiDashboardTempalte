@@ -24,7 +24,7 @@ const deleteUser = async (user) => {
 
         router.reload();
     } catch (error) {
-        toast.error("Failed to delete user."); 
+        toast.error("Failed to delete user.");
     }
 };
 
@@ -46,10 +46,6 @@ const filteredUsers = computed(() => {
 
 const showModal = ref(false);
 const userToDelete = ref(null);
-const askDelete = (user) => {
-    userToDelete.value = user;
-    showModal.value = true;
-};
 
 const confirmDelete = () => {
     axios.delete(`/users/${userToDelete.value.id}`);
@@ -219,7 +215,7 @@ const confirmDelete = () => {
                                 <span
                                     v-for="role in user.roles"
                                     :key="role.id"
-                                    class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded mr-1"
+                                    class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full mr-1"
                                 >
                                     {{ role.name }}
                                 </span>

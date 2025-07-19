@@ -16,7 +16,8 @@ public function roles_and_permissions()
 {
     return Inertia::render('Roles/Index', [
         'roles' => Role::with('permissions')->get(),
-        'permissions' => Permission::pluck('name')->toArray(),
+        'permissions' => Permission::all(),
+        'permissionsPlucked' => Permission::pluck('name')->toArray(),
     ]);
 }
 public function index()
@@ -67,6 +68,21 @@ public function update(Request $request, Role $role)
     $role->syncPermissions($validated['permissions']);
 
     return redirect()->route('roles.index')->with('success', 'Role updated');
+}
+
+public function destroy(Role $role)
+{
+    if ($role->users()->count() > 0) {
+        return response()->json([
+            'message' => 'Cannot delete role: it is assigned to one or more users.',
+        ], 422);
+    }
+
+    $role->delete();
+
+    return response()->json([
+        'message' => 'Role deleted successfully.',
+    ]);
 }
 
 }

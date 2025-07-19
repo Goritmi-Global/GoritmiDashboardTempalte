@@ -115,7 +115,7 @@
     >
         <span class="flex items-center gap-2">
             <UsersIcon class="w-5 h-5" />
-            Users
+            Users 
         </span>
         <ChevronDownIcon
             class="w-4 h-4 transition-transform"
@@ -130,8 +130,8 @@
         >
             <Link
                 href="/users"
-                class="sidebar-link text-sm"
-                :class="{ 'sidebar-link-active': route().current('users') }"
+                class="sidebar-link text-sm mt-1"
+                :class="{ 'sidebar-link-active': route().current('users.index') }"
             >
                 <DocumentIcon class="w-5 h-5" />
                 Manage Users
@@ -144,15 +144,6 @@
             >
                 <DocumentIcon class="w-5 h-5" />
                 Roles & Permissions
-            </Link>
-
-            <Link
-                href="/permissions"
-                class="sidebar-link text-sm"
-                :class="{ 'sidebar-link-active': route().current('permissions') }"
-            >
-                <DocumentIcon class="w-5 h-5" />
-                Permissions
             </Link>
         </div>
     </Transition>
@@ -198,16 +189,17 @@ const isProjectActive = computed(
         route().current("projects.dealing")
 );
 const usersOpen = ref(
+    route().current("users.index") ||
     route().current("users") ||
-    route().current("roles") ||
-    route().current("permissions")
+    route().current("roles-permissions")
 );
 
 const isUserSubmenuActive = computed(
     () =>
+        route().current("users.index") ||
         route().current("users") ||
-        route().current("roles") ||
-        route().current("permissions")
+        route().current("roles-permissions")
 );
+
 
 </script>
