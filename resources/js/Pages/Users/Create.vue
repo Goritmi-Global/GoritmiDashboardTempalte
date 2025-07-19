@@ -3,6 +3,8 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
 import { computed } from "vue";
 import Multiselect from "vue-multiselect";
+import { router } from "@inertiajs/vue3";
+import { toast } from "vue3-toastify";
 
 const props = defineProps({
     user: Object,
@@ -17,17 +19,27 @@ const form = useForm({
     email: props.user?.email || "",
     password: "",
     password_confirmation: "",
-    roles: props.user?.roles?.map((r) => r.name) || [],
+    roles: props.user?.roles || [],
 });
 
 const submit = () => {
-    form.roles = form.roles.map((role) => role.name);
+    form.roles = form.roles.map((role) => role.name); // send only names
 
-    if (isEdit.value) {
-        form.put(`/users/${props.user.id}`);
-    } else {
-        form.post("/users");
-    }
+    const action = isEdit.value
+        ? form.put(`/users/${props.user.id}`, {
+              onSuccess: () => {
+                  toast.success("User record updated successfully");
+                  router.visit("/users");
+              },
+              onError: () => toast.error("Failed to update user"),
+          })
+        : form.post("/users", {
+              onSuccess: () => {
+                  toast.success("User record created successfully");
+                  router.visit("/users");
+              },
+              onError: () => toast.error("Failed to create user"),
+          });
 };
 </script>
 
@@ -199,6 +211,33 @@ const submit = () => {
                             track-by="name"
                             label="name"
                         />
+                        <div v-if="form.roles.length" class="mt-6 space-y-3">
+                            <h2 class="text-lg font-semibold text-gray-800">
+                                Role-Based Permissions
+                            </h2>
+
+                            <div
+                                v-for="role in form.roles"
+                                :key="role.id || role.name"
+                                class="text-sm text-gray-700"
+                            >
+                                <strong class="mr-2">{{ role.name }}:</strong>
+
+                                <template v-if="role.permissions?.length">
+                                    <span
+                                        v-for="permission in role.permissions"
+                                        :key="permission.id || permission.name"
+                                        class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full mr-1"
+                                    >
+                                        {{ permission.name }}
+                                    </span>
+                                </template>
+
+                                <span v-else class="text-gray-400 italic"
+                                    >No permissions</span
+                                >
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Submit -->

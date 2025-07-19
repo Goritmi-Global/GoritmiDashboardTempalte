@@ -8,6 +8,8 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Hash;  
+use Illuminate\Support\Facades\DB; 
 class UserController extends Controller
 {
     /**
@@ -28,7 +30,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        $roles = Role::all();
+        $roles = Role::with('permissions')->get();
+
         return Inertia::render('Users/Create', ['roles' => $roles]);
     }
 
@@ -37,24 +40,28 @@ class UserController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|confirmed|min:6',
-            'roles' => 'array'
-        ]);
+{
+    // dd($request);
+    $validated = $request->validate([
+        'name' => 'required',
+        'email' => 'required|email|unique:users',
+        'password' => 'required|confirmed|min:6',
+        'roles' => 'array',
+        'roles.*' => 'exists:roles,name',
+    ]);
 
+    DB::transaction(function () use ($validated) {
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
+            'password' => Hash::make($validated['password']),
         ]);
 
         $user->syncRoles($validated['roles']);
+    });
 
-        return redirect()->route('users.index')->with('success', 'User created successfully');
-    }
+    return to_route('users.index')->with('success', 'User created successfully');
+}
 
 
     /**
@@ -72,13 +79,11 @@ class UserController extends Controller
     {
        
 
-        $user = User::with('roles')->findOrFail($id);
-        $roles = Role::all();
-        
+        $user = User::with('roles.permissions')->findOrFail($id);
+        $roles = Role::with('permissions')->get();
         return Inertia::render('Users/Create', [
             'user' => $user,
-            'roles' => $roles,
-            // 'userRoles' => $user->roles->pluck('name'),
+            'roles' => $roles, 
         ]);
 
 
@@ -87,10 +92,31 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    public function update(Request $request, $id)
+{
+    $user = User::findOrFail($id);
+
+    $validated = $request->validate([
+        'name' => 'required',
+        'email' => 'required|email|unique:users,email,' . $user->id,
+        'password' => 'nullable|confirmed|min:6',
+        'roles' => 'array',
+        'roles.*' => 'exists:roles,name',
+    ]);
+
+    $user->update([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'password' => $validated['password']
+            ? Hash::make($validated['password'])
+            : $user->password,
+    ]);
+
+    $user->syncRoles($validated['roles']);
+
+    return to_route('users.index')->with('success', 'User record updated successfully');
+}
+
 
     /**
      * Remove the specified resource from storage.
