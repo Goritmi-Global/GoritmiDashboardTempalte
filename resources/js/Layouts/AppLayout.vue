@@ -4,7 +4,6 @@ import Aside from "@/Layouts/Aside.vue";
 import Header from "@/Layouts/Header.vue";
 
 const sidebarOpen = ref(true);
-
 const showScrollTop = ref(false);
 
 function scrollToTop() {
@@ -30,10 +29,15 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="flex h-screen bg-gray-100 relative">
-        <Aside :sidebar-open="sidebarOpen" />
-        <div class="flex-1 flex flex-col">
-            <Header @toggle-sidebar="sidebarOpen = !sidebarOpen" />
+    <div class="flex flex-col min-h-screen bg-gray-100">
+        <!-- Header with logo toggle -->
+        <Header :sidebar-visible="sidebarOpen" @toggle-sidebar="sidebarOpen = !sidebarOpen" />
+
+        <div class="flex flex-1">
+            <!-- Sidebar -->
+            <Aside :sidebarOpen="sidebarOpen" />
+
+            <!-- Main content area -->
             <main class="flex-1 p-4 overflow-y-auto">
                 <slot />
             </main>
@@ -54,12 +58,7 @@ onUnmounted(() => {
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                 >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M5 15l7-7 7 7"
-                    />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
                 </svg>
             </button>
         </Transition>

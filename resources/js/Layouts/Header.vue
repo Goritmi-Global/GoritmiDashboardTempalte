@@ -1,30 +1,31 @@
 <template>
-    <header
-        class="bg-white shadow border-b h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8"
-    >
-        <div class="flex items-center gap-4">
-            <button
-                @click="emit('toggle-sidebar')"
-                class="text-gray-500 hover:text-gray-700 focus:outline-none"
-            >
-                <svg
-                    class="h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M4 6h16M4 12h16M4 18h16"
-                    />
-                </svg>
-            </button>
+  <header class="bg-white shadow border-b h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-4">
+        <!-- Logo - Hidden when sidebar is collapsed -->
+      <Link :href="route('dashboard')" class="block">
+        <img
+          src="https://goritmi.co.uk/images/logo.png"
+          alt="Goritmi Logo"
+          class="h-10"
+        />
+      </Link>
+      <button
+        @click="emit('toggle-sidebar')"
+        class="text-gray-500 hover:text-gray-700 focus:outline-none mx-36"
+      >
+        <!-- Hamburger Icon -->
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
 
-            <h1 class="text-lg font-semibold">
-                {{ $page.component.split("/").pop() }}
-            </h1>
+      
+      
+
+      <!-- <h1 class="text-lg font-semibold">
+        {{ $page.component.split("/").pop() }}
+      </h1> -->
+    
         </div>
         <div class="flex items-center">
             <!-- Notification Dropdown -->
@@ -412,11 +413,22 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 const emit = defineEmits(["toggle-sidebar"]);
+import { Link } from "@inertiajs/vue3";
 
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
+
 const showNotifications = ref(false);
 const showMessages = ref(false);
+
+// optional: pass sidebar state from parent if needed for v-show logo
+const props = defineProps({
+  sidebarVisible: {
+    type: Boolean,
+    default: true,
+  },
+});
+const showLogo = computed(() => props.sidebarVisible);
 </script>

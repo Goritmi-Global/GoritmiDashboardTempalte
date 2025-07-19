@@ -1,24 +1,14 @@
 <template>
-    <aside
-        :class="[
-            'transition-all duration-300',
-            sidebarOpen ? 'w-72' : 'w-0 overflow-hidden',
-        ]"
-        class="bg-[#296FB6] text-white border-r border-gray-200"
-    >
-        <!-- Logo -->
-        <div class="h-16 flex items-center justify-center border-b">
-            <Link :href="route('dashboard')">
-                <img
-                    src="https://goritmi.co.uk/images/logo1.png"
-                    alt="Goritmi Logo"
-                    class="block h-16 w-auto"
-                />
-            </Link>
-        </div>
-
+  <aside
+    :class="[
+      'transition-all duration-300',
+      sidebarOpen ? 'w-72' : 'w-0 overflow-hidden',
+    ]"
+    class="bg-[#296FB6] text-white border-r border-gray-200"
+  >
+    <nav class="py-10 px-3">
         <!-- Navigation -->
-        <nav class="py-6">
+        
     <Link
         href="/dashboard"
         class="sidebar-link"
