@@ -28,7 +28,7 @@ class PermissionController extends Controller
 
         Permission::create(['name' => $request->name]);
 
-        return redirect()->route('permissions.index')->with('success', 'Permission created.');
+        return redirect()->route('roles-permissions')->with('success', 'Permission created.');
     }
 
     public function edit(Permission $permission)
@@ -44,7 +44,7 @@ class PermissionController extends Controller
 
         $permission->update(['name' => $request->name]);
 
-        return redirect()->route('permissions.index')->with('success', 'Permission updated.');
+        return redirect()->route('roles-permissions')->with('success', 'Permission updated.');
     }
 
     public function destroy(Permission $permission)

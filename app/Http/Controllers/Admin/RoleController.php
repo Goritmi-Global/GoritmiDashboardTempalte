@@ -16,7 +16,7 @@ public function roles_and_permissions()
 {
     return Inertia::render('Roles/Index', [
         'roles' => Role::with('permissions')->get(),
-        'permissions' => Permission::all(),
+        'permissions' => Permission::pluck('name')->toArray(),
     ]);
 }
 public function index()
