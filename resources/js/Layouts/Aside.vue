@@ -106,6 +106,59 @@
         <DocumentIcon class="w-5 h-5" />
         HR
     </Link>
+    <!-- Users Dropdown -->
+<div>
+    <button
+        @click="usersOpen = !usersOpen"
+        class="sidebar-link justify-between text-left"
+        :class="{ 'sidebar-link-active': isUserSubmenuActive }"
+    >
+        <span class="flex items-center gap-2">
+            <UsersIcon class="w-5 h-5" />
+            Users
+        </span>
+        <ChevronDownIcon
+            class="w-4 h-4 transition-transform"
+            :class="{ 'rotate-180': usersOpen }"
+        />
+    </button>
+
+    <Transition name="sidebar-dropdown">
+        <div
+            v-show="usersOpen"
+            class="space-y-1 bg-[#296FB6] transition-all"
+        >
+            <Link
+                href="/users"
+                class="sidebar-link text-sm"
+                :class="{ 'sidebar-link-active': route().current('users') }"
+            >
+                <DocumentIcon class="w-5 h-5" />
+                Manage Users
+            </Link>
+
+            <Link
+                href="/roles-permissions"
+                class="sidebar-link text-sm"
+                :class="{ 'sidebar-link-active': route().current('roles-permissions') }"
+            >
+                <DocumentIcon class="w-5 h-5" />
+                Roles & Permissions
+            </Link>
+
+            <Link
+                href="/permissions"
+                class="sidebar-link text-sm"
+                :class="{ 'sidebar-link-active': route().current('permissions') }"
+            >
+                <DocumentIcon class="w-5 h-5" />
+                Permissions
+            </Link>
+        </div>
+    </Transition>
+</div>
+
+    
 </nav>
 
     </aside>
@@ -144,4 +197,17 @@ const isProjectActive = computed(
         route().current("projects.existing") ||
         route().current("projects.dealing")
 );
+const usersOpen = ref(
+    route().current("users") ||
+    route().current("roles") ||
+    route().current("permissions")
+);
+
+const isUserSubmenuActive = computed(
+    () =>
+        route().current("users") ||
+        route().current("roles") ||
+        route().current("permissions")
+);
+
 </script>

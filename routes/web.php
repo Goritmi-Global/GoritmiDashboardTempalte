@@ -1,11 +1,17 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\GlobalPageController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
 use Inertia\Inertia;
 
+// Controllers
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\GlobalPageController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\PermissionController;
+
+// Public
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -15,31 +21,66 @@ Route::get('/', function () {
     ]);
 });
 
+// Authenticated Dashboard
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Admin-Only Routes (Role: admin)
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+   
+});
+
+// Authenticated Routes (Any Logged In User)
 Route::middleware('auth')->group(function () {
+     // User Management
+    Route::resource('users', UserController::class);
+    Route::get('users/{user}/roles', [UserController::class, 'editRoles'])->name('users.roles.edit');
+    Route::put('users/{user}/roles', [UserController::class, 'updateRoles'])->name('users.roles.update');
+
+    // Role Management
+        Route::get('roles-permissions', [RoleController::class, 'roles_and_permissions'])->name('roles-permissions');
+
+        
+    Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
+    Route::get('roles/create', [RoleController::class, 'create'])->name('roles.create');
+    Route::post('roles', [RoleController::class, 'store'])->name('roles.store');
+    Route::get('roles/{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+    Route::put('roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+    
+    // Permission Management
+    Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
+    Route::get('/permissions/create', [PermissionController::class, 'create'])->name('permissions.create');
+    Route::post('/permissions', [PermissionController::class, 'store'])->name('permissions.store');
+    Route::get('/permissions/{permission}/edit', [PermissionController::class, 'edit'])->name('permissions.edit');
+    Route::put('/permissions/{permission}', [PermissionController::class, 'update'])->name('permissions.update');
+    Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy'])->name('permissions.destroy');
+
+
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Dashboard + Modules
     Route::get('/dashboard', [GlobalPageController::class, 'dashboard'])->name('dashboard');
     Route::get('/crm', [GlobalPageController::class, 'crm'])->name('crm');
     Route::get('/hr', [GlobalPageController::class, 'hr'])->name('hr');
-    Route::get('/projects', [GlobalPageController::class, 'projects'])->name('projects'); 
-    Route::get('/projects/new', [GlobalPageController::class, 'projects'])->name('projects.new'); 
-    Route::get('/projects/existing', [GlobalPageController::class, 'projects'])->name('projects.existing'); 
-    Route::get('/projects/dealing', [GlobalPageController::class, 'projects'])->name('projects.dealing'); 
-    
-    // Accounting Routes
+
+    // Projects
+    Route::get('/projects', [GlobalPageController::class, 'projects'])->name('projects');
+    Route::get('/projects/new', [GlobalPageController::class, 'projects'])->name('projects.new');
+    Route::get('/projects/existing', [GlobalPageController::class, 'projects'])->name('projects.existing');
+    Route::get('/projects/dealing', [GlobalPageController::class, 'projects'])->name('projects.dealing');
+
+    // Accounting
     Route::get('/accounting/create', [GlobalPageController::class, 'createAccounting'])->name('accounting.create');
     Route::post('/accounting/store', [GlobalPageController::class, 'storeAccounting'])->name('accounting.store');
     Route::get('/accounting/show/{id}', [GlobalPageController::class, 'showAccounting'])->name('accounting.show');
     Route::delete('/accounting/delete/{id}', [GlobalPageController::class, 'deleteAccounting'])->name('accounting.delete');
- 
     Route::get('/accounting', [GlobalPageController::class, 'accounting'])->name('accounting');
-     
 });
 
-require __DIR__.'/auth.php';
+// Auth scaffolding
+require __DIR__ . '/auth.php';
+
