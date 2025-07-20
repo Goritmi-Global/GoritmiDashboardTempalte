@@ -46,7 +46,8 @@ const submit = () => {
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+<transition name="fade-modal">
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" v-if="true">
     <div class="bg-white w-full max-w-md rounded-lg shadow-lg p-6 relative">
       <button
         class="absolute top-2 right-2 text-xl font-bold text-gray-500 hover:text-gray-800"
@@ -85,4 +86,24 @@ const submit = () => {
       </form>
     </div>
   </div>
+</transition>
 </template>
+<style scoped>
+.fade-modal-enter-active,
+.fade-modal-leave-active {
+  transition: opacity 1s ease, transform 1s ease;
+}
+
+.fade-modal-enter-from,
+.fade-modal-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.fade-modal-enter-to,
+.fade-modal-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}
+</style>
+
