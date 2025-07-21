@@ -95,7 +95,7 @@ const submit = () => {
           <button
             type="submit"
             :disabled="form.processing"
-            class="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700"
+            class="px-4 py-2 text-sm rounded bg-[#296FB6] hover:bg-[#1f5a96] text-white"
           >
             {{ isEdit ? 'Update' : 'Create' }}
           </button>

@@ -244,7 +244,7 @@ const submit = () => {
                     <div class="col-span-12 pt-4">
                         <button
                             type="submit"
-                            class="bg-blue-600 text-white px-5 py-2 text-sm font-medium rounded hover:bg-blue-700"
+                            class="bg-[#296FB6] hover:bg-[#1f5a96] text-white px-5 py-2 text-sm font-medium rounded hover:bg-blue-700"
                             :disabled="form.processing"
                         >
                             {{ isEdit ? "Update User" : "Create User" }}

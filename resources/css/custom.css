@@ -64,3 +64,22 @@
     text-decoration: none;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+/* multi-select custom */
+.multiselect__tag {
+
+    background-color: #296FB6 !important;
+    color: white !important; 
+}
+.multiselect__tag-icon::after {
+    content: "×";
+    color: white !important; 
+    font-size: 14px;
+}
+.multiselect__option--highlight {
+    background: #296FB6;
+    outline: none;
+    color: white;
+}
+
+ 
