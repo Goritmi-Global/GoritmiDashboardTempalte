@@ -3,63 +3,77 @@
 namespace App\Http\Controllers\Accounting;
 
 use App\Http\Controllers\Controller;
+use App\Models\Accounting\Cashbook;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CashbookController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $cashbook = Cashbook::firstOrCreate([
+            'id' => 1,
+        ], [
+            'name' => 'Cash in Hand',
+            'balance' => 0,
+        ]);
+
+        return Inertia::render('Accounting/Cashbook/Index', [
+            'cashbook' => $cashbook,
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return Inertia::render('Accounting/Cashbook/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'balance' => 'required|numeric|min:0',
+        ]);
+
+        Cashbook::create($request->only('name', 'balance'));
+
+        return redirect()->route('cashbook.index')->with('success', 'Cashbook created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Cashbook $cashbook)
     {
-        //
+        return Inertia::render('Accounting/Cashbook/Show', [
+            'cashbook' => $cashbook,
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Cashbook $cashbook)
     {
-        //
+        return Inertia::render('Accounting/Cashbook/Edit', [
+            'cashbook' => $cashbook,
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Cashbook $cashbook)
     {
-        //
+        // dd("test");
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'balance' => 'required|numeric|min:0',
+        ]);
+
+        $cashbook->update($request->only('name', 'balance'));
+
+        return redirect()->back()->with('success', 'Cashbook updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Cashbook $cashbook)
     {
-        //
+        try {
+            $cashbook->delete();
+            return redirect()->route('cashbook.index')->with('success', 'Cashbook deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to delete cashbook.');
+        }
     }
 }

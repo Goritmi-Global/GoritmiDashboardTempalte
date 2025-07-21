@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cashbook extends Model
 {
-    protected $fillable = ['name', 'location', 'description'];
+    protected $fillable = ['name', 'balance'];
 
     public function accounts()
     {

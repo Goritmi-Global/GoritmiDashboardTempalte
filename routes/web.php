@@ -116,8 +116,12 @@ Route::prefix('accounting')->middleware('auth')->group(function () {
     Route::resource('incomes', IncomeController::class);
     Route::resource('accounts', AccountController::class);
     Route::resource('banks', BankController::class);
-    Route::resource('cashbooks', CashbookController::class);
     Route::resource('forecastings', ForecastingController::class);
+    
+    Route::resource('cashbooks', CashbookController::class);
+    // Route::get('cashbook', [CashbookController::class, 'index'])->name('cashbook.index');
+    Route::put('cashbook/{cashbook}', [CashbookController::class, 'update'])->name('cashbook.update');
+
 });
 
 
