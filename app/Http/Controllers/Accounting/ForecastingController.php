@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Accounting;
 
-use App\Models\ExpenseType;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class ExpenseTypeController extends Controller
+class ForecastingController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class ExpenseTypeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ExpenseType $expenseType)
+    public function show(string $id)
     {
         //
     }
@@ -42,7 +42,7 @@ class ExpenseTypeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ExpenseType $expenseType)
+    public function edit(string $id)
     {
         //
     }
@@ -50,7 +50,7 @@ class ExpenseTypeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ExpenseType $expenseType)
+    public function update(Request $request, string $id)
     {
         //
     }
@@ -58,7 +58,7 @@ class ExpenseTypeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ExpenseType $expenseType)
+    public function destroy(string $id)
     {
         //
     }

@@ -11,6 +11,27 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\PermissionController;
 
+use App\Http\Controllers\Accounting\{
+    ExpenseTypeController,
+    IncomeTypeController,
+    ExpenseController,
+    IncomeController,
+    AccountController,
+    BankController,
+    CashbookController,
+    ForecastingController
+};
+
+Route::resource('expense-types', ExpenseTypeController::class);
+Route::resource('income-types', IncomeTypeController::class);
+Route::resource('expenses', ExpenseController::class);
+Route::resource('incomes', IncomeController::class);
+Route::resource('accounts', AccountController::class);
+Route::resource('banks', BankController::class);
+Route::resource('cashbooks', CashbookController::class);
+Route::resource('forecastings', ForecastingController::class);
+
+
 // Public
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -80,11 +101,26 @@ Route::middleware('auth')->group(function () {
     Route::get('/accounting/show/{id}', [GlobalPageController::class, 'showAccounting'])->name('accounting.show');
     Route::delete('/accounting/delete/{id}', [GlobalPageController::class, 'deleteAccounting'])->name('accounting.delete');
     Route::get('/accounting', [GlobalPageController::class, 'accounting'])->name('accounting');
-
  
-    Route::resource('expense-types', ExpenseTypeController::class)->middleware('auth');
+    
+    
+    
+    
 });
+// Resource Controllers for Accounting
+
+Route::prefix('accounting')->middleware('auth')->group(function () {
+    Route::resource('expense-types', ExpenseTypeController::class)->except(['show']);
+    Route::resource('income-types', IncomeTypeController::class)->except(['show']);
+    Route::resource('expenses', ExpenseController::class);
+    Route::resource('incomes', IncomeController::class);
+    Route::resource('accounts', AccountController::class);
+    Route::resource('banks', BankController::class);
+    Route::resource('cashbooks', CashbookController::class);
+    Route::resource('forecastings', ForecastingController::class);
+});
+
+
 
 // Auth scaffolding
 require __DIR__ . '/auth.php';
-

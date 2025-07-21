@@ -15,12 +15,71 @@
                 :active="route().current('dashboard')"
             />
 
-            <NavItem
-                icon="banknotes"
-                text="Accounting"
-                href="/accounting"
-                :active="route().current('accounting')"
-            />
+            <DisclosureItem
+    icon="banknotes"
+    text="Accounting"
+    :open="accountingOpen"
+    @toggle="accountingOpen = !accountingOpen"
+    :active="isAccountingActive"
+>
+    <NavItem
+        icon="document"
+        text="Expense Types"
+        href="/accounting/expense-types"
+        :active="route().current('expense-types.index')"
+        small
+    />
+    <NavItem
+        icon="document"
+        text="Income Types"
+        href="/accounting/income-types"
+        :active="route().current('income-types.index')"
+        small
+    />
+    <NavItem
+        icon="document"
+        text="Expenses"
+        href="/accounting/expenses"
+        :active="route().current('expenses.index')"
+        small
+    />
+    <NavItem
+        icon="document"
+        text="Incomes"
+        href="/accounting/incomes"
+        :active="route().current('incomes.index')"
+        small
+    />
+    <NavItem
+        icon="document"
+        text="Accounts"
+        href="/accounting/accounts"
+        :active="route().current('accounts.index')"
+        small
+    />
+    <NavItem
+        icon="document"
+        text="Banks"
+        href="/accounting/banks"
+        :active="route().current('banks.index')"
+        small
+    />
+    <NavItem
+        icon="document"
+        text="Cashbooks"
+        href="/accounting/cashbooks"
+        :active="route().current('cashbooks.index')"
+        small
+    />
+    <NavItem
+        icon="document"
+        text="Forecasting"
+        href="/accounting/forecastings"
+        :active="route().current('forecastings.index')"
+        small
+    />
+</DisclosureItem>
+
 
             <NavItem
                 icon="user-group"
@@ -150,4 +209,19 @@ const isUserSubmenuActive = computed(
         route().current("users") ||
         route().current("roles-permissions")
 );
+const accountingOpen = ref(
+    route().current('expense-types.index') ||
+    route().current('income-types.index') ||
+    route().current('expenses.index') ||
+    route().current('incomes.index') ||
+    route().current('accounts.index') ||
+    route().current('banks.index') ||
+    route().current('cashbooks.index') ||
+    route().current('forecastings.index')
+);
+
+const isAccountingActive = computed(() =>
+    accountingOpen.value
+);
+
 </script>
