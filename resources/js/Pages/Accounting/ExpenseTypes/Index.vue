@@ -2,7 +2,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Head, router } from "@inertiajs/vue3";
 import { ref } from "vue";
-import { Pencil, Plus } from "lucide-vue-next";
+import { Pencil, Plus, KeyRound, Trash2 } from "lucide-vue-next";
 import { toast } from "vue3-toastify";
 
 import ExpenseTypeFormModal from "./ExpenseTypeFormModal.vue";
@@ -10,7 +10,7 @@ import ExpenseTypeFormModal from "./ExpenseTypeFormModal.vue";
 const props = defineProps({
     types: Array,
 });
-const showModal = ref(true);
+const showModal = ref(false);
 const editingType = ref(null);
 const itemToDelete = ref(null);
 // State
@@ -51,17 +51,138 @@ const refresh = () => {
     <AppLayout>
         <div class="p-6 space-y-6">
             <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-bold">Expense Types</h1>
-                <button
-                    class="bg-[#296FB6] hover:bg-[#1f5a96] text-white text-sm px-4 py-2 rounded-lg"
-                    @click="openModal()"
+                <div class="space-y-2">
+                    <h1 class="text-2xl font-bold">Expense Types</h1>
+                    <nav class="flex text-sm" aria-label="Breadcrumb">
+                        <ol
+                            class="inline-flex items-center space-x-1 md:space-x-2"
+                        >
+                            <li class="inline-flex items-center">
+                                <Link
+                                    href="/"
+                                    class="text-gray-700 hover:text-blue-600 inline-flex items-center"
+                                >
+                                    <svg
+                                        class="w-3 h-3 mr-2"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"
+                                        />
+                                    </svg>
+                                    Home
+                                </Link>
+                            </li>
+                            <li>
+                                <div class="flex items-center">
+                                    <svg
+                                        class="w-3 h-3 text-gray-400 mx-1"
+                                        fill="none"
+                                        viewBox="0 0 6 10"
+                                    >
+                                        <path
+                                            stroke="currentColor"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="m1 9 4-4-4-4"
+                                        />
+                                    </svg>
+                                    <span class="text-gray-500"
+                                        >Expense Types</span
+                                    >
+                                </div>
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+
+                <PrimaryModalButton
+                    @click="() => openModal()"
+                    label="Add Expense Type"
                 >
-                    <Plus class="w-4 h-4 inline-block mr-1" />
-                    Add Expense Type
-                </button>
+                    <template #icon><Plus class="w-4 h-4" /></template>
+                </PrimaryModalButton>
             </div>
 
             <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div
+                    class="flex flex-col px-4 py-3 space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0"
+                >
+                    <div class="relative w-full md:w-1/3">
+                        <div
+                            class="absolute inset-y-0 left-0 flex items-center pl-3"
+                        >
+                            <svg
+                                class="w-5 h-5 text-gray-400"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    clip-rule="evenodd"
+                                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                />
+                            </svg>
+                        </div>
+                        <input
+                            v-model="search"
+                            type="text"
+                            placeholder="Search by name or email"
+                            class="pl-10 p-2 border border-gray-300 rounded-lg text-sm w-full"
+                        />
+                    </div>
+
+                    <div class="relative">
+                        <button
+                            @click="toggleFilter"
+                            class="flex items-center gap-1 px-3 py-2 text-sm border rounded-md"
+                        >
+                            <svg
+                                class="w-4 h-4"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    clip-rule="evenodd"
+                                    d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                                />
+                            </svg>
+                            Filter
+                        </button>
+                        <div
+                            v-show="showFilter"
+                            class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 p-3"
+                        >
+                            <h6 class="mb-2 text-sm font-medium">
+                                Filter by Role
+                            </h6>
+                            <ul class="space-y-2 text-sm">
+                                <li
+                                    v-for="role in props.roles"
+                                    :key="role.id"
+                                    class="flex items-center"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        :id="role.name"
+                                        :value="role.name"
+                                        v-model="selectedRoles"
+                                        class="w-4 h-4 text-blue-600 rounded"
+                                    />
+                                    <label
+                                        :for="role.name"
+                                        class="ml-2 text-sm"
+                                        >{{ role.name }}</label
+                                    >
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
                 <table class="w-full text-sm text-left text-gray-600">
                     <thead class="bg-gray-100 text-xs text-gray-700 uppercase">
                         <tr>
