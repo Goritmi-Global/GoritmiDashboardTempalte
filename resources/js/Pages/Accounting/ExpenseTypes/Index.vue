@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Head, router } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { Pencil, Plus, KeyRound, Trash2 } from "lucide-vue-next";
 import { toast } from "vue3-toastify";
 
@@ -10,10 +10,21 @@ import ExpenseTypeFormModal from "./ExpenseTypeFormModal.vue";
 const props = defineProps({
     types: Array,
 });
+
+// State
 const showModal = ref(false);
 const editingType = ref(null);
 const itemToDelete = ref(null);
-// State
+// States for search and filter
+const search = ref("");
+ 
+const filteredTypes = computed(() => {
+    if (!search.value) return props.types;
+    return props.types.filter((t) =>
+        t.name.toLowerCase().includes(search.value.toLowerCase())
+    );
+});
+
 
 // Open modal
 const openModal = (type = null) => {
@@ -129,58 +140,12 @@ const refresh = () => {
                         <input
                             v-model="search"
                             type="text"
-                            placeholder="Search by name or email"
+                             placeholder="Search by name"
                             class="pl-10 p-2 border border-gray-300 rounded-lg text-sm w-full"
                         />
                     </div>
 
-                    <div class="relative">
-                        <button
-                            @click="toggleFilter"
-                            class="flex items-center gap-1 px-3 py-2 text-sm border rounded-md"
-                        >
-                            <svg
-                                class="w-4 h-4"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                            >
-                                <path
-                                    fill-rule="evenodd"
-                                    clip-rule="evenodd"
-                                    d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
-                                />
-                            </svg>
-                            Filter
-                        </button>
-                        <div
-                            v-show="showFilter"
-                            class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20 p-3"
-                        >
-                            <h6 class="mb-2 text-sm font-medium">
-                                Filter by Role
-                            </h6>
-                            <ul class="space-y-2 text-sm">
-                                <li
-                                    v-for="role in props.roles"
-                                    :key="role.id"
-                                    class="flex items-center"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        :id="role.name"
-                                        :value="role.name"
-                                        v-model="selectedRoles"
-                                        class="w-4 h-4 text-blue-600 rounded"
-                                    />
-                                    <label
-                                        :for="role.name"
-                                        class="ml-2 text-sm"
-                                        >{{ role.name }}</label
-                                    >
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+                    
                 </div>
 
                 <table class="w-full text-sm text-left text-gray-600">
@@ -194,7 +159,7 @@ const refresh = () => {
                     </thead>
                     <tbody>
                         <tr
-                            v-for="(type, index) in props.types"
+                            v-for="(type, index) in filteredTypes"
                             :key="type.id"
                             class="border-b hover:bg-gray-50"
                         >

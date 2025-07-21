@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Head, router } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { Pencil, Plus, KeyRound, Trash2 } from "lucide-vue-next";
 import { toast } from "vue3-toastify";
 
@@ -15,6 +15,15 @@ const props = defineProps({
 const showModal = ref(false);
 const editingType = ref(null);
 const itemToDelete = ref(null);
+
+// States for search 
+const search = ref("");
+const filteredTypes = computed(() => {
+    if (!search.value) return props.types;
+    return props.types.filter((t) =>
+        t.name.toLowerCase().includes(search.value.toLowerCase())
+    );
+});
 
 // Open modal
 const openModal = (type = null) => {
@@ -107,6 +116,35 @@ const refresh = () => {
 
             <!-- Table -->
             <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div
+                    class="flex flex-col px-4 py-3 space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0"
+                >
+                    <div class="relative w-full md:w-1/3">
+                        <div
+                            class="absolute inset-y-0 left-0 flex items-center pl-3"
+                        >
+                            <svg
+                                class="w-5 h-5 text-gray-400"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    clip-rule="evenodd"
+                                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                />
+                            </svg>
+                        </div>
+                        <input
+                            v-model="search"
+                            type="text"
+                             placeholder="Search by name"
+                            class="pl-10 p-2 border border-gray-300 rounded-lg text-sm w-full"
+                        />
+                    </div>
+
+                    
+                </div>
                 <table class="w-full text-sm text-left text-gray-600">
                     <thead class="bg-gray-100 text-xs text-gray-700 uppercase">
                         <tr>
@@ -118,7 +156,7 @@ const refresh = () => {
                     </thead>
                     <tbody>
                         <tr
-                            v-for="(type, index) in props.types"
+                            v-for="(type, index) in filteredTypes"
                             :key="type.id"
                             class="border-b hover:bg-gray-50"
                         >
