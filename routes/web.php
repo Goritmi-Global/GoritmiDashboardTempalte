@@ -80,6 +80,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/accounting/show/{id}', [GlobalPageController::class, 'showAccounting'])->name('accounting.show');
     Route::delete('/accounting/delete/{id}', [GlobalPageController::class, 'deleteAccounting'])->name('accounting.delete');
     Route::get('/accounting', [GlobalPageController::class, 'accounting'])->name('accounting');
+
+ 
+    Route::resource('expense-types', ExpenseTypeController::class)->middleware('auth');
 });
 
 // Auth scaffolding
