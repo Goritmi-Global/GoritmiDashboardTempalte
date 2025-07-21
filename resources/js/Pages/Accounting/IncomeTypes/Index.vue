@@ -16,7 +16,7 @@ const showModal = ref(false);
 const editingType = ref(null);
 const itemToDelete = ref(null);
 
-// States for search 
+// States for search
 const search = ref("");
 const filteredTypes = computed(() => {
     if (!search.value) return props.types;
@@ -138,12 +138,10 @@ const refresh = () => {
                         <input
                             v-model="search"
                             type="text"
-                             placeholder="Search by name"
+                            placeholder="Search by name"
                             class="pl-10 p-2 border border-gray-300 rounded-lg text-sm w-full"
                         />
                     </div>
-
-                    
                 </div>
                 <table class="w-full text-sm text-left text-gray-600">
                     <thead class="bg-gray-100 text-xs text-gray-700 uppercase">
