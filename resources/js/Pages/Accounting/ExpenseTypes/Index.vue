@@ -1,178 +1,140 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
-import { ref, watch } from "vue";
+import { Head, router } from "@inertiajs/vue3";
+import { ref } from "vue";
+import { Pencil, Plus } from "lucide-vue-next";
 import { toast } from "vue3-toastify";
+
+import ExpenseTypeFormModal from "./ExpenseTypeFormModal.vue"; 
 
 const props = defineProps({
     types: Array,
 });
+const itemToDelete = ref(null);
+// State
+const showModal = ref(true);
+const editingType = ref(null);
 
-const showModal = ref(false);
-const isEdit = ref(false);
-const selectedType = ref(null);
-
-const form = useForm({
-    name: "",
-});
-
-const openCreateModal = () => {
-    isEdit.value = false;
-    form.name = "";
-    selectedType.value = null;
+// Open modal
+const openModal = (type = null) => {
+    editingType.value = type;
     showModal.value = true;
 };
 
-const openEditModal = (type) => {
-    isEdit.value = true;
-    selectedType.value = type;
-    form.name = type.name;
-    showModal.value = true;
-};
+// Delete
+// const deleteType = async (type) => {
+//     if (!confirm(`Are you sure you want to delete "${type.name}"?`)) return;
 
-const closeModal = () => {
-    showModal.value = false;
-};
+//     try {
+//         await axios.delete(`/accounting/expense-types/${type.id}`);
+//         toast.success("Expense type deleted successfully");
+//         refresh();
+//     } catch (error) {
+//         toast.error("Failed to delete expense type.");
+//     }
+// };
 
-const submit = () => {
-    const url = isEdit.value
-        ? `/accounting/expense-types/${selectedType.value.id}`
-        : "/accounting/expense-types";
-
-    const method = isEdit.value ? form.put : form.post;
-
-    method(url, {
-        onSuccess: () => {
-            toast.success(isEdit.value ? "Updated successfully" : "Created successfully");
-            closeModal();
-        },
-        onError: () => {
-            toast.error("Please fix the form errors.");
-        },
-    });
-};
-
-const destroy = (id) => {
-    if (confirm("Are you sure you want to delete this record?")) {
-        form.delete(`/accounting/expense-types/${id}`, {
-            onSuccess: () => toast.success("Deleted successfully"),
-            onError: () => toast.error("Failed to delete"),
-        });
+const deleteItem = async () => {
+  try {
+    await axios.delete(`/accounting/expense-types/${itemToDelete.value.id}`);
+    toast.success(`${itemToDelete.value.name} deleted successfully`);
+    refresh();
+  } catch (e) {
+    if (e.response?.data?.message) {
+      toast.error(e.response.data.message);
+    } else {
+      toast.error("Failed to delete expense type.");
     }
+  } finally {
+    itemToDelete.value = null;
+  }
+};
+
+
+
+const refresh = () => {
+    router.reload({ only: ['types'] });
 };
 </script>
 
 <template>
-    <AppLayout title="Expense Types">
-        <Head title="Expense Types" />
-        <div class="py-6 px-4">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold">Expense Types</h2>
+    <Head title="Expense Types" />
+    <AppLayout>
+        <div class="p-6 space-y-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold">Expense Types</h1>
                 <button
-                    @click="openCreateModal"
-                    class="btn btn-primary rounded-pill shadow-sm"
+                    class="bg-[#296FB6] hover:bg-[#1f5a96] text-white text-sm px-4 py-2 rounded-lg"
+                    @click="openModal()"
                 >
-                    Add New
+                    <Plus class="w-4 h-4 inline-block mr-1" />
+                    Add Expense Type
                 </button>
             </div>
 
-            <div class="table-responsive shadow-sm rounded-4 bg-white">
-                <table class="table table-hover">
-                    <thead class="table-primary">
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <table class="w-full text-sm text-left text-gray-600">
+                    <thead class="bg-gray-100 text-xs text-gray-700 uppercase">
                         <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th class="text-end">Actions</th>
+                            <th class="px-6 py-3">#</th>
+                            <th class="px-6 py-3">Name</th>
+                            <th class="px-6 py-3">Description</th>
+                            <th class="px-6 py-3 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(type, index) in props.types" :key="type.id">
-                            <td>{{ index + 1 }}</td>
-                            <td>{{ type.name }}</td>
-                            <td class="text-end">
-                                <div class="btn-group">
-                                    <button
-                                        class="btn btn-sm btn-outline-primary rounded-pill"
-                                        @click="openEditModal(type)"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        class="btn btn-sm btn-outline-danger rounded-pill"
-                                        @click="destroy(type.id)"
-                                    >
-                                        Delete
-                                    </button>
+                        <tr
+                            v-for="(type, index) in props.types"
+                            :key="type.id"
+                            class="border-b hover:bg-gray-50"
+                        >
+                            <td class="px-6 py-4">{{ index + 1 }}</td>
+                            <td class="px-6 py-4 font-semibold">{{ type.name }}</td>
+                            <td class="px-6 py-4">{{ type.description || '-' }}</td>
+                            <td class="px-6 py-4 text-center space-x-2">
+                                 <div
+                                    class="flex items-center justify-center gap-2"
+                                >
+                                <button
+                                    @click="() => openModal(type)"
+                                    title="Edit"
+                                    class="p-2 rounded-full text-blue-600 hover:bg-blue-100"
+                                >
+                                    <Pencil class="w-4 h-4" />
+                                </button>
+                                <ConfirmModal
+                                    v-if="type.name !== 'admin'"
+                                    :title="'Confirm Delete'"
+                                    :message="`Are you sure you want to delete ${type.name}?`"
+                                    :showDeleteButton="true"
+                                    @confirm="
+                                        () => {
+                                            itemToDelete = type;
+                                            deleteType = 'type';
+                                            deleteItem();
+                                        }
+                                    "
+                                    @cancel="() => {}"
+                                />
                                 </div>
                             </td>
                         </tr>
                         <tr v-if="!props.types.length">
-                            <td colspan="3" class="text-center text-muted py-3">
-                                No expense types found.
-                            </td>
+                            <td colspan="4" class="text-center text-gray-500 py-6">No expense types found.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
+            <!-- Modal -->
+            <ExpenseTypeFormModal
+                v-if="showModal"
+                :type="editingType"
+                @close="() => { showModal = false; editingType = null }"
+                @submitted="refresh"
+            />
+
+              
         </div>
-
-        <!-- Modal -->
-        <transition name="fade-modal">
-            <div v-if="showModal" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-                <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-lg">
-                    <h3 class="text-lg font-semibold mb-4">
-                        {{ isEdit ? "Edit Expense Type" : "Add Expense Type" }}
-                    </h3>
-                    <form @submit.prevent="submit" class="space-y-4">
-                        <div>
-                            <label class="block mb-1 text-sm font-medium">Name</label>
-                            <input
-                                v-model="form.name"
-                                type="text"
-                                class="form-control rounded-pill"
-                                :class="{ 'is-invalid': form.errors.name }"
-                            />
-                            <div v-if="form.errors.name" class="text-danger text-sm mt-1">
-                                {{ form.errors.name }}
-                            </div>
-                        </div>
-
-                        <div class="flex justify-end gap-2">
-                            <button
-                                type="button"
-                                @click="closeModal"
-                                class="btn btn-outline-secondary rounded-pill"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                :disabled="form.processing"
-                                class="btn btn-primary rounded-pill"
-                            >
-                                {{ isEdit ? "Update" : "Create" }}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </transition>
     </AppLayout>
 </template>
-
-<style scoped>
-.fade-modal-enter-active,
-.fade-modal-leave-active {
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-.fade-modal-enter-from,
-.fade-modal-leave-to {
-    opacity: 0;
-    transform: scale(0.95);
-}
-.fade-modal-enter-to,
-.fade-modal-leave-from {
-    opacity: 1;
-    transform: scale(1);
-}
-</style>

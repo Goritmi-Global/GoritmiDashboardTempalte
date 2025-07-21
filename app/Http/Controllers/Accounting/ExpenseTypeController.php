@@ -24,7 +24,7 @@ class ExpenseTypeController extends Controller
             'name' => 'required|string|max:255|unique:expense_types,name',
         ]);
 
-        ExpenseType::create($request->only('name'));
+        ExpenseType::create($request->only('name','description'));
 
         return redirect()->back()->with('success', 'Expense type created successfully.');
     }
@@ -35,15 +35,32 @@ class ExpenseTypeController extends Controller
             'name' => 'required|string|max:255|unique:expense_types,name,' . $expenseType->id,
         ]);
 
-        $expenseType->update($request->only('name'));
+        $expenseType->update($request->only('name','description'));
 
         return redirect()->back()->with('success', 'Expense type updated successfully.');
     }
 
     public function destroy(ExpenseType $expenseType)
     {
-        $expenseType->delete();
+        try {
+            // Check if the expense type is used in related tables
+            if ($expenseType->expenses()->exists() || $expenseType->forecastings()->exists()) {
+                return response()->json([
+                    'message' => 'Cannot delete. This expense type is associated with existing records.'
+                ], 422);
+            }
 
-        return redirect()->back()->with('success', 'Expense type deleted successfully.');
+            $expenseType->delete();
+
+            return response()->json(['message' => 'Expense type deleted successfully.']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong while deleting.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
+
+
+
 }

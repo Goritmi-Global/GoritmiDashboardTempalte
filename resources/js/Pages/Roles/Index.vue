@@ -45,7 +45,7 @@ const deleteType = ref(null);
 // Deletion Methods
 const deleteRole = async () => {
     try {
-        await axios.get(`/roles/${itemToDelete.value.id}`);
+        await axios.delete(`/roles/${itemToDelete.value.id}`);
         toast.success(`${itemToDelete.value.name} deleted successfully`);
         refresh(); // call your reload function after deletion
     } catch (e) {
