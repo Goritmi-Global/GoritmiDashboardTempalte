@@ -1,43 +1,43 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
-import { toast } from 'vue3-toastify';
+import { useForm } from "@inertiajs/vue3";
+import { ref, watch } from "vue";
+import { toast } from "vue3-toastify";
 
 const props = defineProps({
-  type: Object,
+    type: Object,
 });
-const emit = defineEmits(['close', 'submitted']);
+const emit = defineEmits(["close", "submitted"]);
 
 const isEdit = ref(!!props.type);
 
 const form = useForm({
-  name: props.type?.name || '',
-  description: props.type?.description || '',
+    name: props.type?.name || "",
+    description: props.type?.description || "",
 });
 
 watch(() => props.type, () => {
-  isEdit.value = !!props.type;
-  form.name = props.type?.name || '';
-  form.description = props.type?.description || '';
+    isEdit.value = !!props.type;
+    form.name = props.type?.name || '';
+    form.description = props.type?.description || '';
 });
 
 const submit = () => {
-  const url = isEdit.value
-    ? `/accounting/expense-types/${props.type.id}`
-    : `/accounting/expense-types`;
+    const url = isEdit.value
+        ? `/accounting/income-types/${props.type.id}`
+        : `/accounting/income-types`;
 
-  const options = {
-    onSuccess: () => {
-      toast.success(isEdit.value ? 'Updated successfully' : 'Created successfully');
-      emit('submitted');
-      emit('close');
-    },
-    onError: () => {
-      toast.error('Please fix the errors.');
-    },
-  };
+    const options = {
+        onSuccess: () => {
+            toast.success(isEdit.value ? "Updated successfully" : "Created successfully");
+            emit("submitted");
+            emit("close");
+        },
+        onError: () => {
+            toast.error("Something went wrong.");
+        },
+    };
 
-  isEdit.value ? form.put(url, options) : form.post(url, options);
+    isEdit.value ? form.put(url, options) : form.post(url, options);
 };
 </script>
 
@@ -50,7 +50,7 @@ const submit = () => {
           @click="() => emit('close')"
         >×</button>
 
-        <h2 class="text-xl font-semibold mb-4">{{ isEdit ? 'Edit Expense Type' : 'Create Expense Type' }}</h2>
+        <h2 class="text-xl font-semibold mb-4">{{ isEdit ? 'Edit Income Type' : 'Create Income Type' }}</h2>
 
         <form @submit.prevent="submit" class="space-y-4">
           <div>
@@ -58,8 +58,8 @@ const submit = () => {
             <input
               v-model="form.name"
               type="text" 
+              class="w-full border border-gray-300 rounded-lg px-4 py-2"
               placeholder="Enter name"
-              class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <div v-if="form.errors.name" class="text-sm text-red-500 mt-1">{{ form.errors.name }}</div>
           </div>
@@ -68,8 +68,8 @@ const submit = () => {
             <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea
               v-model="form.description"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2"
               placeholder="Enter description"
-              class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <div v-if="form.errors.description" class="text-sm text-red-500 mt-1">{{ form.errors.description }}</div>
           </div>
@@ -85,7 +85,7 @@ const submit = () => {
               :disabled="form.processing"
               class="px-4 py-2 text-sm rounded bg-[#296FB6] hover:bg-[#1f5a96] text-white"
             >
-              {{ isEdit ? 'Update' : 'Create' }}
+              {{ isEdit ? "Update" : "Create" }}
             </button>
           </div>
         </form>

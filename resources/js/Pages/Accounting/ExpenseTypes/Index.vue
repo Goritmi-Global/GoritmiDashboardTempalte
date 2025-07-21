@@ -5,15 +5,15 @@ import { ref } from "vue";
 import { Pencil, Plus } from "lucide-vue-next";
 import { toast } from "vue3-toastify";
 
-import ExpenseTypeFormModal from "./ExpenseTypeFormModal.vue"; 
+import ExpenseTypeFormModal from "./ExpenseTypeFormModal.vue";
 
 const props = defineProps({
     types: Array,
 });
-const itemToDelete = ref(null);
-// State
 const showModal = ref(true);
 const editingType = ref(null);
+const itemToDelete = ref(null);
+// State
 
 // Open modal
 const openModal = (type = null) => {
@@ -21,39 +21,28 @@ const openModal = (type = null) => {
     showModal.value = true;
 };
 
-// Delete
-// const deleteType = async (type) => {
-//     if (!confirm(`Are you sure you want to delete "${type.name}"?`)) return;
-
-//     try {
-//         await axios.delete(`/accounting/expense-types/${type.id}`);
-//         toast.success("Expense type deleted successfully");
-//         refresh();
-//     } catch (error) {
-//         toast.error("Failed to delete expense type.");
-//     }
-// };
+// Delete item
 
 const deleteItem = async () => {
-  try {
-    await axios.delete(`/accounting/expense-types/${itemToDelete.value.id}`);
-    toast.success(`${itemToDelete.value.name} deleted successfully`);
-    refresh();
-  } catch (e) {
-    if (e.response?.data?.message) {
-      toast.error(e.response.data.message);
-    } else {
-      toast.error("Failed to delete expense type.");
+    try {
+        await axios.delete(
+            `/accounting/expense-types/${itemToDelete.value.id}`
+        );
+        toast.success(`${itemToDelete.value.name} deleted successfully`);
+        refresh();
+    } catch (e) {
+        if (e.response?.data?.message) {
+            toast.error(e.response.data.message);
+        } else {
+            toast.error("Failed to delete expense type.");
+        }
+    } finally {
+        itemToDelete.value = null;
     }
-  } finally {
-    itemToDelete.value = null;
-  }
 };
 
-
-
 const refresh = () => {
-    router.reload({ only: ['types'] });
+    router.reload({ only: ["types"] });
 };
 </script>
 
@@ -89,38 +78,46 @@ const refresh = () => {
                             class="border-b hover:bg-gray-50"
                         >
                             <td class="px-6 py-4">{{ index + 1 }}</td>
-                            <td class="px-6 py-4 font-semibold">{{ type.name }}</td>
-                            <td class="px-6 py-4">{{ type.description || '-' }}</td>
+                            <td class="px-6 py-4 font-semibold">
+                                {{ type.name }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ type.description || "-" }}
+                            </td>
                             <td class="px-6 py-4 text-center space-x-2">
-                                 <div
+                                <div
                                     class="flex items-center justify-center gap-2"
                                 >
-                                <button
-                                    @click="() => openModal(type)"
-                                    title="Edit"
-                                    class="p-2 rounded-full text-blue-600 hover:bg-blue-100"
-                                >
-                                    <Pencil class="w-4 h-4" />
-                                </button>
-                                <ConfirmModal
-                                    v-if="type.name !== 'admin'"
-                                    :title="'Confirm Delete'"
-                                    :message="`Are you sure you want to delete ${type.name}?`"
-                                    :showDeleteButton="true"
-                                    @confirm="
-                                        () => {
-                                            itemToDelete = type;
-                                            deleteType = 'type';
-                                            deleteItem();
-                                        }
-                                    "
-                                    @cancel="() => {}"
-                                />
+                                    <button
+                                        @click="() => openModal(type)"
+                                        title="Edit"
+                                        class="p-2 rounded-full text-blue-600 hover:bg-blue-100"
+                                    >
+                                        <Pencil class="w-4 h-4" />
+                                    </button>
+                                    <ConfirmModal
+                                        :title="'Confirm Delete'"
+                                        :message="`Are you sure you want to delete ${type.name}?`"
+                                        :showDeleteButton="true"
+                                        @confirm="
+                                            () => {
+                                                itemToDelete = type;
+                                                deleteType = 'type';
+                                                deleteItem();
+                                            }
+                                        "
+                                        @cancel="() => {}"
+                                    />
                                 </div>
                             </td>
                         </tr>
                         <tr v-if="!props.types.length">
-                            <td colspan="4" class="text-center text-gray-500 py-6">No expense types found.</td>
+                            <td
+                                colspan="4"
+                                class="text-center text-gray-500 py-6"
+                            >
+                                No expense types found.
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -130,11 +127,14 @@ const refresh = () => {
             <ExpenseTypeFormModal
                 v-if="showModal"
                 :type="editingType"
-                @close="() => { showModal = false; editingType = null }"
+                @close="
+                    () => {
+                        showModal = false;
+                        editingType = null;
+                    }
+                "
                 @submitted="refresh"
             />
-
-              
         </div>
     </AppLayout>
 </template>

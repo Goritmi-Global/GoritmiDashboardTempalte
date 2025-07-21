@@ -10,11 +10,11 @@ use Inertia\Inertia;
 class IncomeTypeController extends Controller
 {
     public function index()
-    { 
+    {
         $types = IncomeType::latest()->get();
 
         return Inertia::render('Accounting/IncomeTypes/Index', [
-            'types' => $types,
+            'types' => $types
         ]);
     }
 
@@ -22,28 +22,43 @@ class IncomeTypeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:income_types,name',
+            'description' => 'nullable|string|max:1000',
         ]);
 
-        IncomeType::create($request->only('name'));
+        IncomeType::create($request->only('name', 'description'));
 
-        return redirect()->back()->with('success', 'Income type created successfully.');
+        return redirect()->back();
     }
 
     public function update(Request $request, IncomeType $incomeType)
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:income_types,name,' . $incomeType->id,
+            'description' => 'nullable|string|max:1000',
         ]);
 
-        $incomeType->update($request->only('name'));
+        $incomeType->update($request->only('name', 'description'));
 
-        return redirect()->back()->with('success', 'Income type updated successfully.');
+        return redirect()->back();
     }
 
     public function destroy(IncomeType $incomeType)
     {
-        $incomeType->delete();
+        try {
+            if ($incomeType->incomes()->exists()) {
+                return response()->json([
+                    'message' => 'Cannot delete. This income type is associated with existing records.'
+                ], 422);
+            }
 
-        return redirect()->back()->with('success', 'Income type deleted successfully.');
+            $incomeType->delete();
+
+            return response()->json(['message' => 'Income type deleted successfully.']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong while deleting.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
