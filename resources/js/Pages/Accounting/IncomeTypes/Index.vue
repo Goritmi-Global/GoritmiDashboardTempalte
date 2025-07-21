@@ -2,9 +2,9 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Head, router } from "@inertiajs/vue3";
 import { ref } from "vue";
-import { Pencil, Plus,KeyRound ,Trash2} from "lucide-vue-next";
+import { Pencil, Plus, KeyRound, Trash2 } from "lucide-vue-next";
 import { toast } from "vue3-toastify";
- 
+
 import IncomeTypeFormModal from "./IncomeTypeFormModal.vue";
 
 const props = defineProps({
@@ -49,7 +49,7 @@ const refresh = () => {
     <Head title="Income Types" />
     <AppLayout>
         <div class="p-6 space-y-6">
-             <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center">
                 <div class="space-y-2">
                     <h1 class="text-2xl font-bold">Income Types</h1>
                     <nav class="flex text-sm" aria-label="Breadcrumb">
@@ -88,30 +88,22 @@ const refresh = () => {
                                             d="m1 9 4-4-4-4"
                                         />
                                     </svg>
-                                    <span class="text-gray-500">Income Types</span>
+                                    <span class="text-gray-500"
+                                        >Income Types</span
+                                    >
                                 </div>
                             </li>
                         </ol>
                     </nav>
                 </div>
 
-                 <!-- <button
-                    class="bg-[#296FB6] hover:bg-[#1f5a96] text-white text-sm px-4 py-2 rounded-lg"
-                    @click="openModal()"
-                >
-                    <Plus class="w-4 h-4 inline-block mr-1" />
-                    Add Income Type
-                </button> -->
                 <PrimaryModalButton
-                         
-                        @click="() => openModal()"
-                        label="Add Income Type"
-                    >
-                        <template #icon><Plus class="w-4 h-4" /></template>
-                    </PrimaryModalButton>
+                    @click="() => openModal()"
+                    label="Add Income Type"
+                >
+                    <template #icon><Plus class="w-4 h-4" /></template>
+                </PrimaryModalButton>
             </div>
-
-            
 
             <!-- Table -->
             <div class="bg-white shadow rounded-lg overflow-hidden">
