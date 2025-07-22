@@ -8,7 +8,8 @@ import { toast } from "vue3-toastify";
 import CashbookFormModal from "./CashbookFormModal.vue";
 
 const props = defineProps({
-    cashbook: Object,
+  accounts: Object,
+  banks: Array,
 });
 
 const showModal = ref(false);

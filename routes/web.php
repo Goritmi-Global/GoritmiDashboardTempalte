@@ -19,7 +19,8 @@ use App\Http\Controllers\Accounting\{
     AccountController,
     BankController,
     CashbookController,
-    ForecastingController
+    ForecastingController,
+    TransactionController
 };
 
 Route::resource('expense-types', ExpenseTypeController::class);
@@ -117,6 +118,7 @@ Route::prefix('accounting')->middleware('auth')->group(function () {
     Route::resource('accounts', AccountController::class);
     Route::resource('banks', BankController::class);
     Route::resource('forecastings', ForecastingController::class);
+    Route::resource('transactions', TransactionController::class)->except(['show', 'destroy']);
     
     Route::resource('cashbooks', CashbookController::class);
     // Route::get('cashbook', [CashbookController::class, 'index'])->name('cashbook.index');

@@ -24,6 +24,13 @@
 >
     <NavItem
         icon="document"
+        text="Transactions"
+        href="/accounting/transactions"
+        :active="route().current('transactions.index')"
+        small
+    />
+    <NavItem
+        icon="document"
         text="Expense Types"
         href="/accounting/expense-types"
         :active="route().current('expense-types.index')"
@@ -210,6 +217,7 @@ const isUserSubmenuActive = computed(
         route().current("roles-permissions")
 );
 const accountingOpen = ref(
+    route().current('transactions.index') ||
     route().current('expense-types.index') ||
     route().current('income-types.index') ||
     route().current('expenses.index') ||

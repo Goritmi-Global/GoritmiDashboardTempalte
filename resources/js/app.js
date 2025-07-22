@@ -15,6 +15,11 @@ import "vue3-toastify/dist/index.css";
 import ConfirmModal from "@/Components/ConfirmModal.vue";
 import PrimaryLinkButton from "@/Components/PrimaryLinkButton.vue";
 import PrimaryModalButton from "@/Components/PrimaryModalButton.vue";
+import ImageCropperModal from "@/Components/ImageCropperModal.vue";
+ 
+
+
+
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -34,6 +39,7 @@ createInertiaApp({
         vueApp.component("ConfirmModal", ConfirmModal);
         vueApp.component("PrimaryLinkButton", PrimaryLinkButton);
         vueApp.component("PrimaryModalButton", PrimaryModalButton);
+        vueApp.component("ImageCropperModal", ImageCropperModal);
 
         vueApp.use(plugin);
         vueApp.use(ZiggyVue);
