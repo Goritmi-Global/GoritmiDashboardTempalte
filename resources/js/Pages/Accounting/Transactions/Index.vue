@@ -232,7 +232,22 @@ const deleteItem = async () => {
                                 }}
                             </td>
                             <td>
-                                {{ account.type }}
+                                <span
+                            :class="{
+                                'bg-green-100 text-green-800':
+                                    account.type === 'income',
+                                'bg-red-100 text-red-800':
+                                    account.type === 'expense',
+                                'bg-yellow-100 text-yellow-800':
+                                    account.type !== 'income' &&
+                                    account.type !== 'expense',
+                            }"
+                            class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium"
+                        >
+                            {{ account.type.replaceAll('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) }}
+
+                        </span>
+                             
                             </td>
                             <td class="px-8 py-3 flex space-x-2">
                                 <img
