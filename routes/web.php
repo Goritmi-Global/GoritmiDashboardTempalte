@@ -110,21 +110,22 @@ Route::middleware('auth')->group(function () {
 });
 // Resource Controllers for Accounting
 
-Route::prefix('accounting')->middleware('auth')->group(function () {
-    Route::resource('expense-types', ExpenseTypeController::class)->except(['show']);
-    Route::resource('income-types', IncomeTypeController::class)->except(['show']);
-    Route::resource('expenses', ExpenseController::class);
-    Route::resource('incomes', IncomeController::class);
-    Route::resource('accounts', AccountController::class);
-    Route::resource('banks', BankController::class);
-    Route::resource('forecastings', ForecastingController::class);
-    Route::resource('transactions', TransactionController::class)->except(['show', 'destroy']);
-    
-    Route::resource('cashbooks', CashbookController::class);
-    // Route::get('cashbook', [CashbookController::class, 'index'])->name('cashbook.index');
-    Route::put('cashbook/{cashbook}', [CashbookController::class, 'update'])->name('cashbook.update');
+Route::prefix('accounting')
+    ->middleware('auth')
+    ->name('accounting.') // ✅ Add this line
+    ->group(function () {
+        Route::resource('expense-types', ExpenseTypeController::class)->except(['show']);
+        Route::resource('income-types', IncomeTypeController::class)->except(['show']);
+        Route::resource('expenses', ExpenseController::class);
+        Route::resource('incomes', IncomeController::class);
+        Route::resource('accounts', AccountController::class);
+        Route::resource('banks', BankController::class);
+        Route::resource('forecastings', ForecastingController::class);
+        Route::resource('transactions', TransactionController::class); // ← now this becomes `accounting.transactions.*`
+        Route::resource('cashbooks', CashbookController::class);
+        Route::put('cashbook/{cashbook}', [CashbookController::class, 'update'])->name('cashbook.update');
+    });
 
-});
 
 
 

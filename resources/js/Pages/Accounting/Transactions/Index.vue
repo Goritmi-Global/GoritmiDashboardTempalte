@@ -6,6 +6,8 @@ import { ref, computed } from "vue";
 import { Pencil, Plus } from "lucide-vue-next";
 import { toast } from "vue3-toastify";
 import TransactionFormModal from "./TransactionForm.vue";
+import { Link } from '@inertiajs/vue3';
+
 
 const props = defineProps({
   accounts: Object,

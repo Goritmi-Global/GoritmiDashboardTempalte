@@ -16,6 +16,7 @@ import ConfirmModal from "@/Components/ConfirmModal.vue";
 import PrimaryLinkButton from "@/Components/PrimaryLinkButton.vue";
 import PrimaryModalButton from "@/Components/PrimaryModalButton.vue";
 import ImageCropperModal from "@/Components/ImageCropperModal.vue";
+import ImageZoomModal from "@/Components/ImageZoomModal.vue";
  
 
 
@@ -40,6 +41,7 @@ createInertiaApp({
         vueApp.component("PrimaryLinkButton", PrimaryLinkButton);
         vueApp.component("PrimaryModalButton", PrimaryModalButton);
         vueApp.component("ImageCropperModal", ImageCropperModal);
+        vueApp.component("ImageZoomModal", ImageZoomModal);
 
         vueApp.use(plugin);
         vueApp.use(ZiggyVue);

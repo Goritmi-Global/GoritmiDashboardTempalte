@@ -3,27 +3,24 @@
 namespace App\Models\Accounting;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Account extends Model
 {
     protected $fillable = [
-        'amount',
-        'type', // cashbook or bank
-        'bank_id',
-        'cashbook_id',
-        'user_id',
-    ];
+    'type',
+    'amount',
+    'date',
+    'reference',
+    'description',
+    'user_id',
+    'account_country',
+    'bank_id',
+    'cashbook_id',
+];
 
-    // public function bank()
-    // {
-    //     return $this->belongsTo(Bank::class);
-    // }
 
-    // public function cashbook()
-    // {
-    //     return $this->belongsTo(Cashbook::class);
-    // }
-     public function sourceable(): MorphTo
+    public function sourceable(): MorphTo
     {
         return $this->morphTo();
     }
