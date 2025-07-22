@@ -7,6 +7,7 @@ import { Pencil, Plus } from "lucide-vue-next";
 import { toast } from "vue3-toastify";
 import TransactionFormModal from "./TransactionForm.vue";
 import { Link } from "@inertiajs/vue3";
+import TransactionDetailModal from "./TransactionDetailModal.vue";
 
 const props = defineProps({
     accounts: Object,
@@ -45,6 +46,29 @@ const openImageModal = (src) => {
     console.log("Opening image modal with src:", src);
     previewImage.value = src;
     showImageModal.value = true;
+};
+
+// Transaction Detail Modal States
+const showDetailsModal = ref(false);
+const selectedTransaction = ref(null);
+
+const openDetails = (txn) => {
+    selectedTransaction.value = txn;
+    showDetailsModal.value = true;
+};
+
+const countryFlag = (code) => {
+    const map = {
+        PAK: { label: "Pakistan", iso: "pk" },
+        UAE: { label: "UAE", iso: "ae" },
+        UK: { label: "United Kingdom", iso: "gb" },
+    };
+
+    const country = map[code] || { label: code, iso: code.toLowerCase() };
+    return {
+        label: country.label,
+        img: `https://flagcdn.com/w40/${country.iso}.png`,
+    };
 };
 </script>
 
@@ -122,12 +146,14 @@ const openImageModal = (src) => {
                     <thead class="bg-gray-100 text-xs text-gray-700 uppercase">
                         <tr>
                             <th class="px-6 py-3">#</th>
-                            <th class="px-6 py-3">Type</th>
+                            <th class="px-6 py-3"></th>
                             <th class="px-6 py-3">Amount</th>
                             <th class="px-6 py-3">Account</th>
-                            <th class="px-6 py-3">Description</th>
+                            <th class="px-6 py-3">Country</th>
                             <th class="px-6 py-3">Date</th>
-                            <th class="px-6 py-3">Receipt</th>
+                            <th class="px-6 py-3">Receipt #</th>
+                            <th class="px-6 py-3">Type</th>
+                            <th class="px-6 py-3">Added By</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -137,28 +163,62 @@ const openImageModal = (src) => {
                             class="border-b hover:bg-gray-50"
                         >
                             <td class="px-6 py-4">{{ index + 1 }}</td>
-                            <td class="px-6 py-4">{{ account.type }}</td>
+
+                            <td
+                                class="px-6 py-4 text-blue-600 cursor-pointer"
+                                @click="openDetails(account)"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-5 w-5 mx-auto transition-transform duration-200 ease-in-out hover:scale-125"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                    />
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                    />
+                                </svg>
+                            </td>
+
                             <td class="px-6 py-4">{{ account.amount }}</td>
                             <td class="px-6 py-4">
                                 {{ account.sourceable?.name }}
                             </td>
-                            <td class="px-6 py-4">{{ account.description }}</td>
-                            <td class="px-6 py-4">{{ account.date }}</td>
                             <td class="px-6 py-4">
                                 <img
-                                    :src="account.receipt_image_url"
-                                    @click="
-                                        openImageModal(
-                                            account.receipt_image_url
-                                        )
+                                    :src="
+                                        countryFlag(account.account_country).img
                                     "
-                                    class="h-24 mt-2 border rounded cursor-zoom-in"
+                                    alt="flag"
+                                    class="w-6 h-4 object-cover rounded shadow"
                                 />
-                                <ImageZoomModal
-                                    :show="showImageModal"
-                                    :image="account.receipt_image_url"
-                                    @close="showImageModal = false"
-                                />
+                                <!-- {{ countryFlag(account.account_country).label }} -->
+                                <!-- {{ account.account_country }} -->
+                            </td>
+                            <td class="px-6 py-4">{{ account.date }}</td>
+                            <td class="px-6 py-4">
+                                {{
+                                    account.incomes.length
+                                        ? account.incomes[0].receipt_no
+                                        : account.expenses.length
+                                        ? account.expenses[0].receipt_no
+                                        : "N/A"
+                                }}
+                            </td>
+                            <td>
+                                {{ account.type }}
+                            </td>
+                            <td>
+                                {{ account.user_id }}
                             </td>
                         </tr>
                         <tr v-if="!filteredAccounts.length">
@@ -186,6 +246,11 @@ const openImageModal = (src) => {
                     }
                 "
                 @submitted="refresh"
+            />
+            <TransactionDetailModal
+                :transaction="selectedTransaction"
+                :show="showDetailsModal"
+                @close="showDetailsModal = false"
             />
         </div>
     </AppLayout>
