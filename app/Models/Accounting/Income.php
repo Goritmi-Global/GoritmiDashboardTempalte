@@ -17,4 +17,9 @@ class Income extends Model
     {
         return $this->belongsTo(Account::class);
     }
+    public function upload()
+    {
+        return $this->belongsTo(\App\Models\Upload::class, 'receipt_image');
+    }
+
 }

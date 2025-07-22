@@ -21,23 +21,22 @@ const mainType = ref(props.transaction?.type || "income");
 const accountCountry = ref("PAK");
 
 const form = useForm({
-  acount_country: accountCountry.value,
-  type: mainType.value,
-  account_type:
-    props.transaction?.sourceable_type === "App\\Models\\Accounting\\Bank"
-      ? "bank"
-      : "cash",
-  source_id: props.transaction?.sourceable_id || null, // just the ID
-  txn_type_id: props.transaction?.txn_type_id || null, // just the ID
-  amount: props.transaction?.amount || "",
-  reference: props.transaction?.reference || "",
-  description: props.transaction?.description || "",
-  date: props.transaction?.date || new Date().toISOString().slice(0, 10),
-  receipt_no: props.transaction?.receipt_no || "",
-  cropped_image: null,
-  destination_bank_id: null,
+    acount_country: accountCountry.value,
+    type: mainType.value,
+    account_type:
+        props.transaction?.sourceable_type === "App\\Models\\Accounting\\Bank"
+            ? "bank"
+            : "cash",
+    source_id: props.transaction?.sourceable_id || null, // just the ID
+    txn_type_id: props.transaction?.txn_type_id || null, // just the ID
+    amount: props.transaction?.amount || "",
+    reference: props.transaction?.reference || "",
+    description: props.transaction?.description || "",
+    date: props.transaction?.date || new Date().toISOString().slice(0, 10),
+    receipt_no: props.transaction?.receipt_no || "",
+    cropped_image: null,
+    destination_bank_id: null,
 });
-
 
 watch(mainType, () => {
     form.type = mainType.value;
@@ -74,7 +73,9 @@ const submit = () => {
 
     const options = {
         onSuccess: () => {
-            toast.success(isEdit.value ? "Transaction updated" : "Transaction created");
+            toast.success(
+                isEdit.value ? "Transaction updated" : "Transaction created"
+            );
             emit("submitted");
             emit("close");
         },
@@ -83,7 +84,6 @@ const submit = () => {
 
     isEdit.value ? form.put(url, options) : form.post(url, options);
 };
-
 
 // Zooming image functionality States
 const showImageModal = ref(false);
@@ -122,11 +122,7 @@ const openImageModal = (src) => {
                         >
                         <Multiselect
                             v-model="accountCountry"
-                            :options="[
-                                'PAK',
-                                'UK',
-                                'UAE', 
-                            ]"
+                            :options="['PAK', 'UK', 'UAE']"
                             placeholder="Select Country"
                             class="w-full"
                         />
@@ -161,18 +157,26 @@ const openImageModal = (src) => {
                             }}
                             Type
                         </label>
-                       <Multiselect
-  :modelValue="(mainType === 'income' ? props.incomeTypes : props.expenseTypes).find(t => t.id === form.txn_type_id) || null"
-  @update:modelValue="val => form.txn_type_id = val?.id"
-  :options="mainType === 'income' ? props.incomeTypes : props.expenseTypes"
-  :track-by="'id'"
-  :label="'name'"
-  placeholder="Select type"
-  class="w-full"
-/>
-
-
-
+                        <Multiselect
+                            :modelValue="
+                                (mainType === 'income'
+                                    ? props.incomeTypes
+                                    : props.expenseTypes
+                                ).find((t) => t.id === form.txn_type_id) || null
+                            "
+                            @update:modelValue="
+                                (val) => (form.txn_type_id = val?.id)
+                            "
+                            :options="
+                                mainType === 'income'
+                                    ? props.incomeTypes
+                                    : props.expenseTypes
+                            "
+                            :track-by="'id'"
+                            :label="'name'"
+                            placeholder="Select type"
+                            class="w-full"
+                        />
                     </div>
 
                     <div
@@ -204,17 +208,21 @@ const openImageModal = (src) => {
                             class="block text-sm font-medium text-gray-700 mb-1"
                             >Select Bank</label
                         >
-                       <Multiselect
-  :modelValue="props.banks.find(b => b.id === form.source_id) || null"
-  @update:modelValue="val => form.source_id = val?.id"
-  :options="props.banks"
-  :track-by="'id'"
-  :label="'name'"
-  placeholder="Select bank"
-  class="w-full"
-/>
-
-
+                        <Multiselect
+                            :modelValue="
+                                props.banks.find(
+                                    (b) => b.id === form.source_id
+                                ) || null
+                            "
+                            @update:modelValue="
+                                (val) => (form.source_id = val?.id)
+                            "
+                            :options="props.banks"
+                            :track-by="'id'"
+                            :label="'name'"
+                            placeholder="Select bank"
+                            class="w-full"
+                        />
                     </div>
 
                     <div
@@ -225,17 +233,21 @@ const openImageModal = (src) => {
                             class="block text-sm font-medium text-gray-700 mb-1"
                             >To Bank</label
                         >
-                      <Multiselect
-  :modelValue="props.banks.find(b => b.id === form.destination_bank_id) || null"
-  @update:modelValue="val => form.destination_bank_id = val?.id"
-  :options="props.banks"
-  :track-by="'id'"
-  :label="'name'"
-  placeholder="Select destination bank"
-  class="w-full"
-/>
-
-
+                        <Multiselect
+                            :modelValue="
+                                props.banks.find(
+                                    (b) => b.id === form.destination_bank_id
+                                ) || null
+                            "
+                            @update:modelValue="
+                                (val) => (form.destination_bank_id = val?.id)
+                            "
+                            :options="props.banks"
+                            :track-by="'id'"
+                            :label="'name'"
+                            placeholder="Select destination bank"
+                            class="w-full"
+                        />
                     </div>
 
                     <div class="col-span-12 md:col-span-6">
@@ -246,7 +258,7 @@ const openImageModal = (src) => {
                         <input
                             type="number"
                             v-model="form.amount"
-                            class="w-full border rounded px-3 py-2" 
+                            class="w-full border rounded px-3 py-2"
                         />
                     </div>
 
@@ -258,7 +270,7 @@ const openImageModal = (src) => {
                         <input
                             type="date"
                             v-model="form.date"
-                            class="w-full border rounded px-3 py-2" 
+                            class="w-full border rounded px-3 py-2"
                         />
                     </div>
 
