@@ -70,6 +70,20 @@ const countryFlag = (code) => {
         img: `https://flagcdn.com/w40/${country.iso}.png`,
     };
 };
+
+const deleteItem = async () => {
+    try {
+        await axios.delete(`/accounting/transactions/${itemToDelete.value.id}`);
+        toast.success(`Transaction deleted successfully`);
+        refresh();
+    } catch (e) {
+        toast.error(
+            e.response?.data?.message || "Failed to delete transaction."
+        );
+    } finally {
+        itemToDelete.value = null;
+    }
+};
 </script>
 
 <template>
@@ -143,24 +157,27 @@ const countryFlag = (code) => {
                 </div>
 
                 <table class="w-full text-sm text-left text-gray-600">
-                    <thead class="bg-gray-100 text-xs text-gray-700 uppercase">
+                    <thead
+                        class="bg-gray-100 text-xs text-gray-700 uppercase text-center"
+                    >
                         <tr>
                             <th class="px-6 py-3">#</th>
                             <th class="px-6 py-3"></th>
                             <th class="px-6 py-3">Amount</th>
                             <th class="px-6 py-3">Account</th>
-                            <th class="px-6 py-3">Country</th>
+                            <th class="text-left py-3">Country</th>
                             <th class="px-6 py-3">Date</th>
                             <th class="px-6 py-3">Receipt #</th>
                             <th class="px-6 py-3">Type</th>
-                            <th class="px-6 py-3">Added By</th>
+                            <th class="text-left px-5 py-3">Added By</th>
+                            <th class="px-6 py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
                             v-for="(account, index) in filteredAccounts"
                             :key="account.id"
-                            class="border-b hover:bg-gray-50"
+                            class="border-b hover:bg-gray-50 text-center"
                         >
                             <td class="px-6 py-4">{{ index + 1 }}</td>
 
@@ -217,8 +234,43 @@ const countryFlag = (code) => {
                             <td>
                                 {{ account.type }}
                             </td>
-                            <td>
-                                {{ account.user_id }}
+                            <td class="px-8 py-3 flex space-x-2">
+                                <img
+                                    :src="`https://i.pravatar.cc/40?u=${account.user_id}`"
+                                    class="w-10 h-10 rounded-full"
+                                    alt="User Avatar"
+                                />
+                                <!-- <span class="font-medium text-gray-800">{{
+                                    account.user_id
+                                }}</span> -->
+                            </td>
+                            <td class="px-6 py-4 text-center space-x-2">
+                                <div
+                                    class="flex items-center justify-center gap-2"
+                                >
+                                    <!-- Edit -->
+                                    <button
+                                        @click="() => openModal(account)"
+                                        title="Edit"
+                                        class="p-2 rounded-full text-blue-600 hover:bg-blue-100"
+                                    >
+                                        <Pencil class="w-4 h-4" />
+                                    </button>
+
+                                    <!-- Delete -->
+                                    <ConfirmModal
+                                        :title="'Confirm Delete'"
+                                        :message="`Are you sure you want to delete this transaction?`"
+                                        :showDeleteButton="true"
+                                        @confirm="
+                                            () => {
+                                                itemToDelete = account;
+                                                deleteItem();
+                                            }
+                                        "
+                                        @cancel="() => {}"
+                                    />
+                                </div>
                             </td>
                         </tr>
                         <tr v-if="!filteredAccounts.length">

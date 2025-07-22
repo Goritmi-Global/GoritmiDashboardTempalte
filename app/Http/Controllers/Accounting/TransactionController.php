@@ -71,7 +71,7 @@ public function edit($id)
         'destination_bank_id' => 'nullable|integer',
         'receipt_no' => 'nullable|string',
         'cropped_image' => 'nullable|string',
-        'acount_country' => 'required|string|max:10',
+        'account_country' => 'required|string|max:10',
     ]);
 
     DB::transaction(function () use ($validated) {
@@ -92,7 +92,7 @@ public function edit($id)
                 'description' => $validated['description'],
                 'date' => $validated['date'],
                 'user_id' => $userId,
-                'account_country' => $validated['acount_country'],
+                'account_country' => $validated['account_country'],
             ]);
 
             if ($validated['account_type'] === 'bank') {
@@ -140,7 +140,7 @@ public function edit($id)
                 'description' => $validated['description'] ?? 'Transferred from Bank to Cashbook',
                 'date' => $validated['date'],
                 'user_id' => $userId,
-                'account_country' => $validated['acount_country'],
+                'account_country' => $validated['account_country'],
                 'bank_id' => $bank->id,
                 'cashbook_id' => $cashbook->id,
             ]);
@@ -167,7 +167,7 @@ public function edit($id)
                 'description' => $validated['description'] ?? 'Transferred from Cashbook to Bank',
                 'date' => $validated['date'],
                 'user_id' => $userId,
-                'account_country' => $validated['acount_country'],
+                'account_country' => $validated['account_country'],
                 'bank_id' => $bank->id,
                 'cashbook_id' => $cashbook->id,
             ]);
@@ -185,6 +185,85 @@ public function edit($id)
 
     return redirect()->back()->with('success', 'Transaction created successfully.');
 }
+
+
+public function destroy(Account $transaction)
+{
+    DB::transaction(function () use ($transaction) {
+        $amount = $transaction->amount;
+        $type = $transaction->type;
+
+        // Reverse bank or cashbook balances
+        if ($type === 'income' || $type === 'expense') {
+            if ($transaction->bank_id && $transaction->sourceable_type === Bank::class) {
+                $bank = Bank::find($transaction->bank_id);
+                if ($bank) {
+                    $bank->balance -= $type === 'income' ? $amount : -$amount;
+                    $bank->save();
+                }
+            }
+
+            if ($transaction->cashbook_id && $transaction->sourceable_type === Cashbook::class) {
+                $cashbook = Cashbook::find($transaction->cashbook_id);
+                if ($cashbook) {
+                    $cashbook->balance -= $type === 'income' ? $amount : -$amount;
+                    $cashbook->save();
+                }
+            }
+
+            // Delete linked income/expense
+            if ($type === 'income') {
+                $transaction->incomes()->delete();
+            } elseif ($type === 'expense') {
+                $transaction->expenses()->delete();
+            }
+        }
+
+        // Reverse bank_to_cash
+        elseif ($type === 'bank_to_cash') {
+            $bank = Bank::find($transaction->bank_id);
+            $cashbook = Cashbook::find($transaction->cashbook_id);
+            if ($bank) {
+                $bank->balance += $amount;
+                $bank->save();
+            }
+            if ($cashbook) {
+                $cashbook->balance -= $amount;
+                $cashbook->save();
+            }
+        }
+
+        // Reverse cash_to_bank
+        elseif ($type === 'cash_to_bank') {
+            $bank = Bank::find($transaction->bank_id);
+            $cashbook = Cashbook::find($transaction->cashbook_id);
+            if ($cashbook) {
+                $cashbook->balance += $amount;
+                $cashbook->save();
+            }
+            if ($bank) {
+                $bank->balance -= $amount;
+                $bank->save();
+            }
+        }
+
+        // Delete receipt file if uploaded
+        if ($transaction->incomes->first()?->receipt_image || $transaction->expenses->first()?->receipt_image) {
+            $uploadId = $transaction->incomes->first()?->receipt_image ?? $transaction->expenses->first()?->receipt_image;
+            $upload = Upload::find($uploadId);
+            if ($upload) {
+                delete_file($upload->file_name); // Your helper to remove file
+                $upload->delete();
+            }
+        }
+
+        // Finally delete the account record
+        $transaction->delete();
+    });
+
+    return response()->json(['message' => 'Transaction deleted successfully.']);
+}
+
 
 
 

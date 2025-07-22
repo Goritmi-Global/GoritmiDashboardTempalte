@@ -21,12 +21,13 @@ const mainType = ref(props.transaction?.type || "income");
 const accountCountry = ref("PAK");
 
 const form = useForm({
-    acount_country: accountCountry.value,
+    // account_country: accountCountry.value,
     type: mainType.value,
     account_type:
         props.transaction?.sourceable_type === "App\\Models\\Accounting\\Bank"
             ? "bank"
             : "cash",
+    account_country: props.transaction?.account_country || null, // just the ID
     source_id: props.transaction?.sourceable_id || null, // just the ID
     txn_type_id: props.transaction?.txn_type_id || null, // just the ID
     amount: props.transaction?.amount || "",
@@ -103,10 +104,24 @@ const openImageModal = (src) => {
                 class="bg-white w-full max-w-5xl rounded-lg shadow-lg p-6 relative"
             >
                 <button
-                    class="absolute top-2 right-2 text-xl font-bold text-gray-500 hover:text-gray-800"
-                    @click="() => emit('close')"
+                    class="absolute top-2 right-2 p-2 rounded-full hover:bg-gray-100 transition transform hover:scale-110"
+                    @click="$emit('close')"
+                    title="Close"
                 >
-                    ×
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6 text-red-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M6 18L18 6M6 6l12 12"
+                        />
+                    </svg>
                 </button>
 
                 <h2 class="text-xl font-semibold mb-4">
@@ -121,7 +136,7 @@ const openImageModal = (src) => {
                             >Account Country</label
                         >
                         <Multiselect
-                            v-model="accountCountry"
+                            v-model="form.account_country"
                             :options="['PAK', 'UK', 'UAE']"
                             placeholder="Select Country"
                             class="w-full"
