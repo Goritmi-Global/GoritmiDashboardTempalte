@@ -49,14 +49,14 @@ const countryFlag = (code) => {
                 ]"
             >
                 <!-- Close Button -->
-                <button
-                    class="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition"
+                 <button
+                    class="absolute top-2 right-2 p-2 rounded-full hover:bg-gray-100 transition transform hover:scale-110"
                     @click="$emit('close')"
                     title="Close"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6"
+                        class="h-6 w-6 text-red-500"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"

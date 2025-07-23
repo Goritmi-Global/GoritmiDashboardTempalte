@@ -21,23 +21,48 @@ const mainType = ref(props.transaction?.type || "income");
 const accountCountry = ref("PAK");
 
 const form = useForm({
-    // account_country: accountCountry.value,
-    type: mainType.value,
+    type: props.transaction?.type || "income",
     account_type:
         props.transaction?.sourceable_type === "App\\Models\\Accounting\\Bank"
             ? "bank"
             : "cash",
-    account_country: props.transaction?.account_country || null, // just the ID
-    source_id: props.transaction?.sourceable_id || null, // just the ID
-    txn_type_id: props.transaction?.txn_type_id || null, // just the ID
+    account_country: props.transaction?.account_country || null,
+
+    // 👇 Handle transfers & regular txn
+    source_id:
+        props.transaction?.type === "bank_to_cash"
+            ? props.transaction?.bank_id
+            : props.transaction?.type === "cash_to_bank"
+            ? props.transaction?.cashbook_id
+            : props.transaction?.sourceable_id || null,
+
+    // 👇 Income/Expense type IDs
+    txn_type_id:
+        props.transaction?.incomes?.[0]?.income_type_id ||
+        props.transaction?.expenses?.[0]?.expense_type_id ||
+        null,
+
     amount: props.transaction?.amount || "",
     reference: props.transaction?.reference || "",
     description: props.transaction?.description || "",
     date: props.transaction?.date || new Date().toISOString().slice(0, 10),
-    receipt_no: props.transaction?.receipt_no || "",
+
+    // 👇 Receipt #
+    receipt_no:
+        props.transaction?.incomes?.[0]?.receipt_no ||
+        props.transaction?.expenses?.[0]?.receipt_no ||
+        "",
+
+    // 👇 Will be updated later
     cropped_image: null,
-    destination_bank_id: null,
+
+    // 👇 Only for cash_to_bank
+    destination_bank_id:
+        props.transaction?.type === "cash_to_bank"
+            ? props.transaction?.bank_id
+            : null,
 });
+
 
 watch(mainType, () => {
     form.type = mainType.value;
