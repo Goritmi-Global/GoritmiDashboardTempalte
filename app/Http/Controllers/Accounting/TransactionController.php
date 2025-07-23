@@ -286,57 +286,48 @@ public function update(Request $request, Account $transaction)
         'account_country' => 'required|string|max:10',
     ]);
 
+   
     DB::transaction(function () use ($validated, $transaction) {
         $oldType = $transaction->type;
         $oldAmount = $transaction->amount;
 
-        $typeChanged = $oldType !== $validated['type'];
-        $amountChanged = $oldAmount != $validated['amount'];
-
-        // Only reverse if type or amount changed
-        if ($typeChanged || $amountChanged) {
-            if (in_array($oldType, ['income', 'expense'])) {
-                if ($transaction->bank_id && $transaction->sourceable_type === Bank::class) {
-                    $bank = Bank::find($transaction->bank_id);
-                    if ($bank) {
-                        $bank->balance -= ($oldType === 'income') ? $oldAmount : -$oldAmount;
-                        $bank->save();
-                    }
-                } elseif ($transaction->cashbook_id && $transaction->sourceable_type === Cashbook::class) {
-                    $cashbook = Cashbook::find($transaction->cashbook_id);
-                    if ($cashbook) {
-                        $cashbook->balance -= ($oldType === 'income') ? $oldAmount : -$oldAmount;
-                        $cashbook->save();
-                    }
+        // Reverse previous balance
+        if (in_array($oldType, ['income', 'expense'])) {
+            if ($transaction->bank_id && $transaction->sourceable_type === Bank::class) {
+                $bank = Bank::find($transaction->bank_id);
+                if ($bank) {
+                    $bank->balance -= ($oldType === 'income') ? $oldAmount : -$oldAmount;
+                    $bank->save();
                 }
-            } elseif ($oldType === 'bank_to_cash') {
-                $bank = Bank::find($transaction->bank_id);
+            } elseif ($transaction->cashbook_id && $transaction->sourceable_type === Cashbook::class) {
                 $cashbook = Cashbook::find($transaction->cashbook_id);
-                if ($bank) $bank->balance += $oldAmount;
-                if ($cashbook) $cashbook->balance -= $oldAmount;
-                if ($bank) $bank->save();
-                if ($cashbook) $cashbook->save();
-            } elseif ($oldType === 'cash_to_bank') {
-                $bank = Bank::find($transaction->bank_id);
-                $cashbook = Cashbook::find($transaction->cashbook_id);
-                if ($bank) $bank->balance -= $oldAmount;
-                if ($cashbook) $cashbook->balance += $oldAmount;
-                if ($bank) $bank->save();
-                if ($cashbook) $cashbook->save();
+                if ($cashbook) {
+                    $cashbook->balance -= ($oldType === 'income') ? $oldAmount : -$oldAmount;
+                    $cashbook->save();
+                }
             }
-
-            // Remove old type-specific records
-            $transaction->incomes()->delete();
-            $transaction->expenses()->delete();
+        } elseif ($oldType === 'bank_to_cash') {
+            $bank = Bank::find($transaction->bank_id);
+            $cashbook = Cashbook::find($transaction->cashbook_id);
+            if ($bank) $bank->balance += $oldAmount;
+            if ($cashbook) $cashbook->balance -= $oldAmount;
+            if ($bank) $bank->save();
+            if ($cashbook) $cashbook->save();
+        } elseif ($oldType === 'cash_to_bank') {
+            $bank = Bank::find($transaction->bank_id);
+            $cashbook = Cashbook::find($transaction->cashbook_id);
+            if ($bank) $bank->balance -= $oldAmount;
+            if ($cashbook) $cashbook->balance += $oldAmount;
+            if ($bank) $bank->save();
+            if ($cashbook) $cashbook->save();
         }
 
-        // Upload image
-        $uploadId = null;
-        if (!empty($validated['cropped_image'])) {
-            $uploadId = store_base64_image($validated['cropped_image']);
-        }
+        // Clean up old type-specific records
+        $transaction->incomes()->delete();
+        $transaction->expenses()->delete();
 
-        // Fill base data
+        // Update core fields
+ 
         $transaction->fill([
             'type' => $validated['type'],
             'amount' => $validated['amount'],
@@ -346,14 +337,18 @@ public function update(Request $request, Account $transaction)
             'account_country' => $validated['account_country'],
         ]);
 
-        // --- Handle Modes ---
+        $uploadId = null;
+        if (!empty($validated['cropped_image'])) {
+            $uploadId = store_base64_image($validated['cropped_image']);
+        }
+
+        // Apply new transaction mode logic
         if (in_array($validated['type'], ['income', 'expense'])) {
             if ($validated['account_type'] === 'bank') {
                 $bank = Bank::findOrFail($validated['source_id']);
                 $transaction->sourceable()->associate($bank);
                 $transaction->bank_id = $bank->id;
                 $transaction->cashbook_id = null;
-
                 $bank->balance += ($validated['type'] === 'income') ? $validated['amount'] : -$validated['amount'];
                 $bank->save();
             } else {
@@ -361,7 +356,6 @@ public function update(Request $request, Account $transaction)
                 $transaction->sourceable()->associate($cashbook);
                 $transaction->cashbook_id = $cashbook->id;
                 $transaction->bank_id = null;
-
                 $cashbook->balance += ($validated['type'] === 'income') ? $validated['amount'] : -$validated['amount'];
                 $cashbook->save();
             }
@@ -383,64 +377,36 @@ public function update(Request $request, Account $transaction)
                     'receipt_image' => $uploadId,
                 ]);
             }
-
-        } elseif ($validated['type'] === 'bank_to_cash') {
-            $bank = Bank::query()->lockForUpdate()->findOrFail($validated['source_id']);
-            $cashbook = Cashbook::query()->lockForUpdate()->firstOrFail();
+        } elseif ($validated['type'] === 'bank_to_cash') { 
+           
+            $bank = Bank::findOrFail($validated['source_id']);
+            $cashbook = Cashbook::first();
 
             $transaction->sourceable()->associate($bank);
             $transaction->bank_id = $bank->id;
             $transaction->cashbook_id = $cashbook->id;
 
-            $bankBefore = $bank->balance;
-            $cashBefore = $cashbook->balance;
-
+            // dd("Process amount : " . $validated['amount'], "Already Existing Cashbook balance : ".$cashbook->balance ,"Already Existing Bank balance : ".$bank->balance, "Bank balance updated : ".$bank->balance -= $validated['amount']," Updated Cashbook balance : ".$cashbook->balance += $validated['amount']);
             $bank->balance -= $validated['amount'];
             $cashbook->balance += $validated['amount'];
 
             $bank->save();
             $cashbook->save();
             $transaction->save();
-
-            Log::info('Updated bank_to_cash transaction', [
-                'transaction_id' => $transaction->id,
-                'bank_id' => $bank->id,
-                'cashbook_id' => $cashbook->id,
-                'amount' => $validated['amount'],
-                'bank_balance_before' => $bankBefore,
-                'bank_balance_after' => $bank->balance,
-                'cashbook_balance_before' => $cashBefore,
-                'cashbook_balance_after' => $cashbook->balance,
-            ]);
-
         } elseif ($validated['type'] === 'cash_to_bank') {
-            $cashbook = Cashbook::query()->lockForUpdate()->firstOrFail();
-            $bank = Bank::query()->lockForUpdate()->findOrFail($validated['destination_bank_id']);
+            $cashbook = Cashbook::first();
+            $bank = Bank::findOrFail($validated['destination_bank_id']);
 
             $transaction->sourceable()->associate($cashbook);
             $transaction->cashbook_id = $cashbook->id;
-            $transaction->bank_id = $bank->id;
-
-            $bankBefore = $bank->balance;
-            $cashBefore = $cashbook->balance;
+            // $transaction->bank_id = $bank->id;dd("Process amount : " . $validated['amount'], "Already Existing Cashbook balance : ".$cashbook->balance ,"Already Existing Bank balance : ".$bank->balance, "Bank balance updated : ".$bank->balance -= $validated['amount']," Updated Cashbook balance : ".$cashbook->balance += $validated['amount']);
 
             $cashbook->balance -= $validated['amount'];
             $bank->balance += $validated['amount'];
-
             $cashbook->save();
             $bank->save();
             $transaction->save();
-
-            Log::info('Updated cash_to_bank transaction', [
-                'transaction_id' => $transaction->id,
-                'bank_id' => $bank->id,
-                'cashbook_id' => $cashbook->id,
-                'amount' => $validated['amount'],
-                'bank_balance_before' => $bankBefore,
-                'bank_balance_after' => $bank->balance,
-                'cashbook_balance_before' => $cashBefore,
-                'cashbook_balance_after' => $cashbook->balance,
-            ]);
+              
         }
     });
 
