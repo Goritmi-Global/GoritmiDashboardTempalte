@@ -289,7 +289,7 @@ const openImageModal = (src) => {
                         />
                     </div>
 
-                    <div class="col-span-12 md:col-span-6">
+                    <!-- <div class="col-span-12 md:col-span-6">
                         <label
                             class="block text-sm font-medium text-gray-700 mb-1"
                             >Reference</label
@@ -299,7 +299,7 @@ const openImageModal = (src) => {
                             type="text"
                             class="w-full border rounded px-3 py-2"
                         />
-                    </div>
+                    </div> -->
 
                     <div class="col-span-12 md:col-span-6">
                         <label

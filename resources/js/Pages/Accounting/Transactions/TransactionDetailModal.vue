@@ -151,10 +151,10 @@ const countryFlag = (code) => {
                         <strong>Date:</strong> {{ transaction.date }}
                     </div>
 
-                    <div class="flex items-center gap-2">
+                    <!-- <div class="flex items-center gap-2">
                         <strong>Reference:</strong>
                         {{ transaction.reference || "—" }}
-                    </div>
+                    </div> -->
 
                     <div class="flex items-center gap-2">
                         <strong>Description:</strong>

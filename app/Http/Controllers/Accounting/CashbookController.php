@@ -17,7 +17,7 @@ class CashbookController extends Controller
             'name' => 'Cash in Hand',
             'balance' => 0,
         ]);
-
+ 
         return Inertia::render('Accounting/Cashbook/Index', [
             'cashbook' => $cashbook,
         ]);
