@@ -3,10 +3,12 @@ import { ref, computed, watch } from "vue";
 
 const props = defineProps({
     accounts: Object,
-    // search: String,
     typeFilter: Array,
     showFilter: Boolean,
     showExport: Boolean,
+    year: String,
+    month: String,
+    dateRange: Object,
 });
 
 const emit = defineEmits([
@@ -14,6 +16,9 @@ const emit = defineEmits([
     "update:typeFilter",
     "update:showFilter",
     "update:showExport",
+    "update:year",
+    "update:month",
+    "update:dateRange",
 ]);
 
 // Local reactive copies
@@ -60,13 +65,21 @@ const capital = computed(() => totalIncome.value - totalExpense.value);
 
 const exportToPDF = () => alert("Export to PDF triggered");
 const exportToExcel = () => alert("Export to Excel triggered");
+
+// Adding Filters on dates Year and Month
+const selectedYear = ref(props.year || "");
+const selectedMonth = ref(props.month || "");
+const dateRange = ref(props.dateRange || { from: "", to: "" });
+
+watch(selectedYear, (val) => emit("update:year", val));
+watch(selectedMonth, (val) => emit("update:month", val));
+watch(dateRange, (val) => emit("update:dateRange", val));
 </script>
 
 <template>
     <div
         class="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4"
     >
-        
         <!-- Search -->
         <div class="w-full md:w-1/2">
             <div class="relative w-full">
@@ -132,7 +145,96 @@ const exportToExcel = () => alert("Export to Excel triggered");
                     class="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20"
                 >
                     <div class="p-3">
-                        <h6 class="mb-2 text-sm font-medium">
+                        <!-- Year Filter -->
+                        <div class="mt-4">
+                            <label class="text-sm font-medium mb-1 block"
+                                >Filter by Year</label
+                            >
+                            <select
+                                v-model="selectedYear"
+                                class="w-full border p-1 rounded text-sm"
+                            >
+                                <option value="">All Years</option>
+                                <option
+                                    v-for="year in [
+                                        2025, 2024, 2023, 2022, 2021,
+                                    ]"
+                                    :key="year"
+                                    :value="year"
+                                >
+                                    {{ year }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Month Filter -->
+                        <div class="mt-4">
+                            <label class="text-sm font-medium mb-1 block"
+                                >Filter by Month</label
+                            >
+                            <select
+                                v-model="selectedMonth"
+                                class="w-full border p-1 rounded text-sm"
+                            >
+                                <option value="">All Months</option>
+                                <option
+                                    v-for="(m, i) in [
+                                        'January',
+                                        'February',
+                                        'March',
+                                        'April',
+                                        'May',
+                                        'June',
+                                        'July',
+                                        'August',
+                                        'September',
+                                        'October',
+                                        'November',
+                                        'December',
+                                    ]"
+                                    :key="i"
+                                    :value="i + 1"
+                                >
+                                    {{ m }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- From-To Date -->
+                        <!-- From-To Date -->
+                        <div class="mt-4">
+                            <label class="text-sm font-medium mb-1 block"
+                                >Custom Date Range</label
+                            >
+                            <div class="grid grid-cols-12 gap-2">
+                                <div class="col-span-12">
+                                    <label
+                                        class="text-sm font-medium mb-1 block"
+                                        >From Date</label
+                                    >
+                                    <input
+                                        type="date"
+                                        v-model="dateRange.from"
+                                        class="w-full border p-1 rounded text-sm"
+                                        placeholder="From"
+                                    />
+                                </div>
+                                <div class="col-span-12">
+                                    <label
+                                        class="text-sm font-medium mb-1 block"
+                                        >To Date</label
+                                    >
+                                    <input
+                                        type="date"
+                                        v-model="dateRange.to"
+                                        class="w-full border p-1 rounded text-sm"
+                                        placeholder="To"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <h6 class="mb-2 text-sm font-medium my-">
                             Transaction Type
                         </h6>
                         <ul class="space-y-2 text-sm">
