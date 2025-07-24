@@ -1,0 +1,213 @@
+<script setup>
+import { ref, computed, watch } from "vue";
+
+const props = defineProps({
+    accounts: Object,
+    // search: String,
+    typeFilter: Array,
+    showFilter: Boolean,
+    showExport: Boolean,
+});
+
+const emit = defineEmits([
+    "update:search",
+    "update:typeFilter",
+    "update:showFilter",
+    "update:showExport",
+]);
+
+// Local reactive copies
+const localSearch = ref(props.search || "");
+const localShowFilter = ref(props.showFilter || false);
+const localShowExport = ref(props.showExport || false);
+const selectedTypes = ref(props.typeFilter || []);
+
+// Sync local -> parent
+watch(localSearch, (val) => emit("update:search", val));
+watch(localShowFilter, (val) => emit("update:showFilter", val));
+watch(localShowExport, (val) => emit("update:showExport", val));
+watch(selectedTypes, (val) => emit("update:typeFilter", val));
+
+const filteredAccounts = computed(() => {
+    if (!props.accounts?.data) return [];
+
+    const term = localSearch.value.toLowerCase();
+
+    return props.accounts.data.filter((item) => {
+        const matchesSearch = Object.values(item).some((val) =>
+            String(val).toLowerCase().includes(term)
+        );
+        const matchesType =
+            selectedTypes.value.length === 0 ||
+            selectedTypes.value.includes(item.type);
+        return matchesSearch && matchesType;
+    });
+});
+
+const totalIncome = computed(() =>
+    filteredAccounts.value
+        .filter((a) => a.type === "income")
+        .reduce((sum, a) => sum + Number(a.amount), 0)
+);
+
+const totalExpense = computed(() =>
+    filteredAccounts.value
+        .filter((a) => a.type === "expense")
+        .reduce((sum, a) => sum + Number(a.amount), 0)
+);
+
+const capital = computed(() => totalIncome.value - totalExpense.value);
+
+const exportToPDF = () => alert("Export to PDF triggered");
+const exportToExcel = () => alert("Export to Excel triggered");
+</script>
+
+<template>
+    <div
+        class="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4"
+    >
+        <!-- Metrics -->
+        <div class="flex items-center flex-1 space-x-4 text-sm">
+            <h5>
+                <span class="text-gray-500">All:</span>
+                {{ filteredAccounts.length }}
+            </h5>
+            <h5>
+                <span class="text-gray-500">Expenses:</span> {{ totalExpense }}
+            </h5>
+            <h5>
+                <span class="text-gray-500">Income:</span> {{ totalIncome }}
+            </h5>
+            <h5><span class="text-gray-500">Capital:</span> {{ capital }}</h5>
+        </div>
+
+        <!-- Search -->
+        <div class="w-full md:w-1/2">
+            <div class="relative w-full">
+                <div
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                    <svg
+                        class="w-5 h-5 text-gray-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path
+                            fill-rule="evenodd"
+                            clip-rule="evenodd"
+                            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.9 3.5l4.8 4.8a1 1 0 01-1.4 1.4l-4.8-4.8A6 6 0 012 8z"
+                        />
+                    </svg>
+                </div>
+                <input
+                    v-model="localSearch"
+                    type="text"
+                    class="w-full border border-gray-300 text-sm pl-10 p-2 rounded-lg"
+                    placeholder="Search in all fields..."
+                />
+            </div>
+        </div>
+
+        <!-- Filter & Export -->
+        <div class="flex flex-col md:flex-row items-center gap-3">
+            <!-- Filter Dropdown -->
+            <div class="relative inline-block text-left">
+                <button
+                    @click="localShowFilter = !localShowFilter"
+                    class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-dark border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-600"
+                >
+                    <svg
+                        class="w-4 h-4 text-dark"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path
+                            fill-rule="evenodd"
+                            d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                            clip-rule="evenodd"
+                        />
+                    </svg>
+                    <span>Filter</span>
+                    <svg
+                        class="w-4 h-4 text-dark"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                    >
+                        <path
+                            fill-rule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                            clip-rule="evenodd"
+                        />
+                    </svg>
+                </button>
+
+                <div
+                    v-show="localShowFilter"
+                    class="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20"
+                >
+                    <div class="p-3">
+                        <h6 class="mb-2 text-sm font-medium">
+                            Transaction Type
+                        </h6>
+                        <ul class="space-y-2 text-sm">
+                            <li
+                                v-for="option in [
+                                    { label: 'Income', value: 'income' },
+                                    { label: 'Expense', value: 'expense' },
+                                    {
+                                        label: 'Cash to Bank',
+                                        value: 'cash_to_bank',
+                                    },
+                                    {
+                                        label: 'Bank to Cash',
+                                        value: 'bank_to_cash',
+                                    },
+                                ]"
+                                :key="option.value"
+                                class="flex items-center text-black"
+                            >
+                                <input
+                                    type="checkbox"
+                                    :id="option.value"
+                                    :value="option.value"
+                                    v-model="selectedTypes"
+                                    class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                />
+                                <label :for="option.value" class="ml-2 text-sm">
+                                    {{ option.label }}
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Dropdown -->
+            <div class="relative">
+                <button
+                    @click="localShowExport = !localShowExport"
+                    class="border px-3 py-2 text-sm rounded-md"
+                >
+                    Export
+                </button>
+                <div
+                    v-if="localShowExport"
+                    class="absolute mt-2 right-0 bg-white rounded shadow p-2 w-40 z-10"
+                >
+                    <button
+                        @click="exportToPDF"
+                        class="block w-full text-left px-2 py-1 hover:bg-gray-100"
+                    >
+                        📄 Export PDF
+                    </button>
+                    <button
+                        @click="exportToExcel"
+                        class="block w-full text-left px-2 py-1 hover:bg-gray-100"
+                    >
+                        📊 Export Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

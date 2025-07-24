@@ -96,16 +96,24 @@ const toggleExportDropdown = () => {
                 <div
                     class="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4"
                 >
-                    <!-- <div class="flex items-center flex-1 space-x-4">
+                    <div class="flex items-center flex-1 space-x-4">
                         <h5>
-                            <span class="text-gray-500">All Products:</span>
+                            <span class="text-gray-500">All Enteries:</span>
                             <span class="dark:text-white">123456</span>
                         </h5>
                         <h5>
-                            <span class="text-gray-500">Total sales:</span>
+                            <span class="text-gray-500">Total Expenses:</span>
                             <span class="dark:text-white">$88.4k</span>
                         </h5>
-                    </div> -->
+                        <h5>
+                            <span class="text-gray-500">Total Income:</span>
+                            <span class="dark:text-white">$88.4k</span>
+                        </h5>
+                        <h5>
+                            <span class="text-gray-500">Capital:</span>
+                            <span class="dark:text-white">$88.4k || -$99.8</span>
+                        </h5>
+                    </div>
                     <div class="w-full md:w-1/2">
                         <form class="flex items-center">
                             <label for="simple-search" class="sr-only"

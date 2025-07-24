@@ -1,4 +1,3 @@
-// File: resources/js/Pages/Accounting/Transactions/Index.vue
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Head, router } from "@inertiajs/vue3";
@@ -6,55 +5,84 @@ import { ref, computed } from "vue";
 import { Pencil, Plus } from "lucide-vue-next";
 import { toast } from "vue3-toastify";
 import TransactionFormModal from "./TransactionForm.vue";
-import { Link } from "@inertiajs/vue3";
 import TransactionDetailModal from "./TransactionDetailModal.vue";
+import TransactionToolbar from "./TransactionToolbar.vue";
+import { Link } from "@inertiajs/vue3";
 
 const props = defineProps({
     accounts: Object,
-    incomeTypes: [],
-    expenseTypes: [],
-    banks: [],
+    incomeTypes: Array,
+    expenseTypes: Array,
+    banks: Array,
 });
 
-// console.log("in the index page", props.banks, props.incomeTypes, props.expenseTypes);
 const showModal = ref(false);
+const showDetailsModal = ref(false);
 const editingTransaction = ref(null);
+const selectedTransaction = ref(null);
 const itemToDelete = ref(null);
-
 const search = ref("");
+const typeFilter = ref("");
 
 const filteredAccounts = computed(() => {
-    if (!search.value) return props.accounts.data;
-    return props.accounts.data.filter((item) =>
-        item.description.toLowerCase().includes(search.value.toLowerCase())
-    );
+    if (!props.accounts?.data) return [];
+
+    const term = search.value.toLowerCase();
+    return props.accounts.data.filter((item) => {
+        const matchesSearch = [
+            item.description,
+            item.amount,
+            item.type,
+            item.account_country,
+            item.date,
+            item?.incomes?.[0]?.receipt_no,
+            item?.expenses?.[0]?.receipt_no,
+        ].some((val) => val?.toString().toLowerCase().includes(term));
+
+        const matchesType =
+            !typeFilter.value.length || typeFilter.value.includes(item.type);
+        return matchesSearch && matchesType;
+    });
 });
+// const filteredAccounts = computed(() => {
+//     if (!props.accounts?.data) return [];
+//     const term = search.value.toLowerCase();
+
+//     return props.accounts.data.filter((item) => {
+//         const matchesType = !typeFilter.value || item.type === typeFilter.value;
+
+//         const matchesSearch = [
+//             item.description,
+//             item.amount,
+//             item.type,
+//             item.account_country,
+//             item.date,
+//             item?.incomes?.[0]?.receipt_no,
+//             item?.expenses?.[0]?.receipt_no,
+//         ].some((val) => val?.toString().toLowerCase().includes(term));
+
+//         return matchesType && matchesSearch;
+//     });
+// });
 
 const openModal = (transaction = null) => {
     editingTransaction.value = transaction;
     showModal.value = true;
 };
 
-const refresh = () => {
-    router.reload({ only: ["accounts"] });
-};
-
-// Zooming image functionality States
-const showImageModal = ref(false);
-const previewImage = ref(null);
-const openImageModal = (src) => {
-    console.log("Opening image modal with src:", src);
-    previewImage.value = src;
-    showImageModal.value = true;
-};
-
-// Transaction Detail Modal States
-const showDetailsModal = ref(false);
-const selectedTransaction = ref(null);
-
 const openDetails = (txn) => {
     selectedTransaction.value = txn;
     showDetailsModal.value = true;
+};
+
+const deleteItem = async () => {
+    try {
+        await axios.delete(`/accounting/transactions/${itemToDelete.value.id}`);
+        toast.success(`Transaction deleted successfully`);
+        router.reload({ only: ["accounts"] });
+    } catch (e) {
+        toast.error("Failed to delete transaction.");
+    }
 };
 
 const countryFlag = (code) => {
@@ -63,26 +91,11 @@ const countryFlag = (code) => {
         UAE: { label: "UAE", iso: "ae" },
         UK: { label: "United Kingdom", iso: "gb" },
     };
-
     const country = map[code] || { label: code, iso: code.toLowerCase() };
     return {
         label: country.label,
         img: `https://flagcdn.com/w40/${country.iso}.png`,
     };
-};
-
-const deleteItem = async () => {
-    try {
-        await axios.delete(`/accounting/transactions/${itemToDelete.value.id}`);
-        toast.success(`Transaction deleted successfully`);
-        refresh();
-    } catch (e) {
-        toast.error(
-            e.response?.data?.message || "Failed to delete transaction."
-        );
-    } finally {
-        itemToDelete.value = null;
-    }
 };
 </script>
 
@@ -147,6 +160,7 @@ const deleteItem = async () => {
             </div>
 
             <div class="bg-white shadow rounded-lg overflow-hidden">
+                <!-- <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="flex px-4 py-3">
                     <input
                         v-model="search"
@@ -154,7 +168,15 @@ const deleteItem = async () => {
                         placeholder="Search by description"
                         class="pl-10 p-2 border border-gray-300 rounded-lg text-sm w-full"
                     />
-                </div>
+                </div> -->
+
+                <TransactionToolbar
+                    :accounts="props.accounts"
+                    v-model:search="search"
+                    v-model:typeFilter="typeFilter"
+                    v-model:showFilter="showFilter"
+                    v-model:showExport="showExport"
+                />
 
                 <table class="w-full text-sm text-left text-gray-600">
                     <thead
@@ -233,21 +255,25 @@ const deleteItem = async () => {
                             </td>
                             <td>
                                 <span
-                            :class="{
-                                'bg-green-100 text-green-800':
-                                    account.type === 'income',
-                                'bg-red-100 text-red-800':
-                                    account.type === 'expense',
-                                'bg-yellow-100 text-yellow-800':
-                                    account.type !== 'income' &&
-                                    account.type !== 'expense',
-                            }"
-                            class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium"
-                        >
-                            {{ account.type.replaceAll('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) }}
-
-                        </span>
-                             
+                                    :class="{
+                                        'bg-green-100 text-green-800':
+                                            account.type === 'income',
+                                        'bg-red-100 text-red-800':
+                                            account.type === 'expense',
+                                        'bg-yellow-100 text-yellow-800':
+                                            account.type !== 'income' &&
+                                            account.type !== 'expense',
+                                    }"
+                                    class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium"
+                                >
+                                    {{
+                                        account.type
+                                            .replaceAll("_", " ")
+                                            .replace(/\b\w/g, (l) =>
+                                                l.toUpperCase()
+                                            )
+                                    }}
+                                </span>
                             </td>
                             <td class="px-8 py-3 flex space-x-2">
                                 <img
