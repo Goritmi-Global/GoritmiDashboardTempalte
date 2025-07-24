@@ -1,5 +1,6 @@
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch,onMounted,onBeforeUnmount  } from "vue";
+ 
 
 const props = defineProps({
     accounts: Object,
@@ -74,6 +75,7 @@ const dateRange = ref(props.dateRange || { from: "", to: "" });
 watch(selectedYear, (val) => emit("update:year", val));
 watch(selectedMonth, (val) => emit("update:month", val));
 watch(dateRange, (val) => emit("update:dateRange", val));
+
 </script>
 
 <template>
@@ -108,7 +110,9 @@ watch(dateRange, (val) => emit("update:dateRange", val));
         </div>
 
         <!-- Filter & Export -->
-        <div class="flex flex-col md:flex-row items-center gap-3">
+        <div
+            class="flex flex-col md:flex-row items-center gap-3 relative overflow-visible z-10"
+        >
             <!-- Filter Dropdown -->
             <div class="relative inline-block text-left">
                 <button
@@ -140,138 +144,142 @@ watch(dateRange, (val) => emit("update:dateRange", val));
                     </svg>
                 </button>
 
-                <div
-                    v-show="localShowFilter"
-                    class="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20"
-                >
-                    <div class="p-3">
-                        <!-- Year Filter -->
-                        <div class="mt-4">
-                            <label class="text-sm font-medium mb-1 block"
-                                >Filter by Year</label
-                            >
-                            <select
-                                v-model="selectedYear"
-                                class="w-full border p-1 rounded text-sm"
-                            >
-                                <option value="">All Years</option>
-                                <option
-                                    v-for="year in [
-                                        2025, 2024, 2023, 2022, 2021,
-                                    ]"
-                                    :key="year"
-                                    :value="year"
+                <teleport to="body" class="lg:space-y-8">
+                    <div
+                        v-show="localShowFilter"
+                        class="fixed top-[130px] right-[50px] w-64 bg-white shadow-lg rounded-md z-[9999] p-3 " :style="{ marginTop: '110px', border: '1px solid #296FB6' }"
+                    >
+                        <div class="p-3">
+                            <!-- Year Filter -->
+                            <div class="mt-4">
+                                <label class="text-sm font-medium mb-1 block"
+                                    >Filter by Year</label
                                 >
-                                    {{ year }}
-                                </option>
-                            </select>
-                        </div>
-
-                        <!-- Month Filter -->
-                        <div class="mt-4">
-                            <label class="text-sm font-medium mb-1 block"
-                                >Filter by Month</label
-                            >
-                            <select
-                                v-model="selectedMonth"
-                                class="w-full border p-1 rounded text-sm"
-                            >
-                                <option value="">All Months</option>
-                                <option
-                                    v-for="(m, i) in [
-                                        'January',
-                                        'February',
-                                        'March',
-                                        'April',
-                                        'May',
-                                        'June',
-                                        'July',
-                                        'August',
-                                        'September',
-                                        'October',
-                                        'November',
-                                        'December',
-                                    ]"
-                                    :key="i"
-                                    :value="i + 1"
+                                <select
+                                    v-model="selectedYear"
+                                    class="w-full border p-1 rounded text-sm"
                                 >
-                                    {{ m }}
-                                </option>
-                            </select>
-                        </div>
+                                    <option value="">All Years</option>
+                                    <option
+                                        v-for="year in [
+                                            2025, 2024, 2023, 2022, 2021,
+                                        ]"
+                                        :key="year"
+                                        :value="year"
+                                    >
+                                        {{ year }}
+                                    </option>
+                                </select>
+                            </div>
 
-                        <!-- From-To Date -->
-                        <!-- From-To Date -->
-                        <div class="mt-4">
-                            <label class="text-sm font-medium mb-1 block"
-                                >Custom Date Range</label
-                            >
-                            <div class="grid grid-cols-12 gap-2">
-                                <div class="col-span-12">
-                                    <label
-                                        class="text-sm font-medium mb-1 block"
-                                        >From Date</label
+                            <!-- Month Filter -->
+                            <div class="mt-4">
+                                <label class="text-sm font-medium mb-1 block"
+                                    >Filter by Month</label
+                                >
+                                <select
+                                    v-model="selectedMonth"
+                                    class="w-full border p-1 rounded text-sm"
+                                >
+                                    <option value="">All Months</option>
+                                    <option
+                                        v-for="(m, i) in [
+                                            'January',
+                                            'February',
+                                            'March',
+                                            'April',
+                                            'May',
+                                            'June',
+                                            'July',
+                                            'August',
+                                            'September',
+                                            'October',
+                                            'November',
+                                            'December',
+                                        ]"
+                                        :key="i"
+                                        :value="i + 1"
                                     >
-                                    <input
-                                        type="date"
-                                        v-model="dateRange.from"
-                                        class="w-full border p-1 rounded text-sm"
-                                        placeholder="From"
-                                    />
-                                </div>
-                                <div class="col-span-12">
-                                    <label
-                                        class="text-sm font-medium mb-1 block"
-                                        >To Date</label
-                                    >
-                                    <input
-                                        type="date"
-                                        v-model="dateRange.to"
-                                        class="w-full border p-1 rounded text-sm"
-                                        placeholder="To"
-                                    />
+                                        {{ m }}
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- From-To Date -->
+                            <div class="mt-4">
+                                <label class="text-sm font-medium mb-1 block"
+                                    >Custom Date Range</label
+                                >
+                                <div class="grid grid-cols-12 gap-2">
+                                    <div class="col-span-12">
+                                        <label
+                                            class="text-sm font-medium mb-1 block"
+                                            >From Date</label
+                                        >
+                                        <input
+                                            type="date"
+                                            v-model="dateRange.from"
+                                            class="w-full border p-1 rounded text-sm"
+                                            placeholder="From"
+                                        />
+                                    </div>
+                                    <div class="col-span-12">
+                                        <label
+                                            class="text-sm font-medium mb-1 block"
+                                            >To Date</label
+                                        >
+                                        <input
+                                            type="date"
+                                            v-model="dateRange.to"
+                                            class="w-full border p-1 rounded text-sm"
+                                            placeholder="To"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <h6 class="mb-2 text-sm font-medium my-">
-                            Transaction Type
-                        </h6>
-                        <ul class="space-y-2 text-sm">
-                            <li
-                                v-for="option in [
-                                    { label: 'Income', value: 'income' },
-                                    { label: 'Expense', value: 'expense' },
-                                    {
-                                        label: 'Cash to Bank',
-                                        value: 'cash_to_bank',
-                                    },
-                                    {
-                                        label: 'Bank to Cash',
-                                        value: 'bank_to_cash',
-                                    },
-                                    {
-                                        label: 'Opening Balance',
-                                        value: 'opening_balance',
-                                    },
-                                ]"
-                                :key="option.value"
-                                class="flex items-center text-black"
-                            >
-                                <input
-                                    type="checkbox"
-                                    :id="option.value"
-                                    :value="option.value"
-                                    v-model="selectedTypes"
-                                    class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                />
-                                <label :for="option.value" class="ml-2 text-sm">
-                                    {{ option.label }}
-                                </label>
-                            </li>
-                        </ul>
+                            <h6 class="mb-2 text-sm font-medium my-">
+                                Transaction Type
+                            </h6>
+                            <ul class="space-y-2 text-sm">
+                                <li
+                                    v-for="option in [
+                                        { label: 'Income', value: 'income' },
+                                        { label: 'Expense', value: 'expense' },
+                                        {
+                                            label: 'Cash to Bank',
+                                            value: 'cash_to_bank',
+                                        },
+                                        {
+                                            label: 'Bank to Cash',
+                                            value: 'bank_to_cash',
+                                        },
+                                        {
+                                            label: 'Opening Balance',
+                                            value: 'opening_balance',
+                                        },
+                                    ]"
+                                    :key="option.value"
+                                    class="flex items-center text-black"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        :id="option.value"
+                                        :value="option.value"
+                                        v-model="selectedTypes"
+                                        class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                    />
+                                    <label
+                                        :for="option.value"
+                                        class="ml-2 text-sm"
+                                    >
+                                        {{ option.label }}
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
+                </teleport>
             </div>
 
             <!-- Export Dropdown -->
@@ -303,3 +311,6 @@ watch(dateRange, (val) => emit("update:dateRange", val));
         </div>
     </div>
 </template>
+<style scoped>
+ 
+</style>
