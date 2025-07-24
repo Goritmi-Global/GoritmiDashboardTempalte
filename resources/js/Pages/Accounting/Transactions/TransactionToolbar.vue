@@ -1,6 +1,5 @@
 <script setup>
-import { ref, computed, watch,onMounted,onBeforeUnmount  } from "vue";
- 
+import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
 
 const props = defineProps({
     accounts: Object,
@@ -75,7 +74,6 @@ const dateRange = ref(props.dateRange || { from: "", to: "" });
 watch(selectedYear, (val) => emit("update:year", val));
 watch(selectedMonth, (val) => emit("update:month", val));
 watch(dateRange, (val) => emit("update:dateRange", val));
-
 </script>
 
 <template>
@@ -147,7 +145,11 @@ watch(dateRange, (val) => emit("update:dateRange", val));
                 <teleport to="body" class="lg:space-y-8">
                     <div
                         v-show="localShowFilter"
-                        class="fixed top-[130px] right-[50px] w-64 bg-white shadow-lg rounded-md z-[9999] p-3 " :style="{ marginTop: '110px', border: '1px solid #296FB6' }"
+                        class="fixed top-[130px] right-[50px] w-64 bg-white shadow-lg rounded-md z-[9999] p-3"
+                        :style="{
+                            marginTop: '110px',
+                            border: '1px solid #296FB6',
+                        }"
                     >
                         <div class="p-3">
                             <!-- Year Filter -->
@@ -311,6 +313,4 @@ watch(dateRange, (val) => emit("update:dateRange", val));
         </div>
     </div>
 </template>
-<style scoped>
- 
-</style>
+<style scoped></style>
