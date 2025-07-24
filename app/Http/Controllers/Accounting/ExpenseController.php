@@ -3,63 +3,23 @@
 namespace App\Http\Controllers\Accounting;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Accounting\Expense;
+use App\Models\Accounting\Account;
+use Inertia\Inertia;
 
 class ExpenseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
-    }
+        $expenses = Expense::with('account')->latest()->get();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $totalExpenseAmount = Account::where('type', 'expense')->sum('amount');
+        $expenseCount = Account::where('type', 'expense')->count();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return Inertia::render('Accounting/Expenses/Index', [
+            'expenses' => $expenses,
+            'totalExpenseAmount' => $totalExpenseAmount,
+            'expenseCount' => $expenseCount,
+        ]);
     }
 }
