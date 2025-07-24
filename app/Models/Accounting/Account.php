@@ -10,13 +10,15 @@ class Account extends Model
     protected $fillable = [
     'type',
     'amount',
-    'date',
     'reference',
     'description',
+    'date',
     'user_id',
     'account_country',
     'bank_id',
     'cashbook_id',
+    'sourceable_type', // must be fillable
+    'sourceable_id',   // must be fillable
 ];
 
 

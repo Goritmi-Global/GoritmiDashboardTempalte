@@ -44,26 +44,6 @@ const filteredAccounts = computed(() => {
         return matchesSearch && matchesType;
     });
 });
-// const filteredAccounts = computed(() => {
-//     if (!props.accounts?.data) return [];
-//     const term = search.value.toLowerCase();
-
-//     return props.accounts.data.filter((item) => {
-//         const matchesType = !typeFilter.value || item.type === typeFilter.value;
-
-//         const matchesSearch = [
-//             item.description,
-//             item.amount,
-//             item.type,
-//             item.account_country,
-//             item.date,
-//             item?.incomes?.[0]?.receipt_no,
-//             item?.expenses?.[0]?.receipt_no,
-//         ].some((val) => val?.toString().toLowerCase().includes(term));
-
-//         return matchesType && matchesSearch;
-//     });
-// });
 
 const openModal = (transaction = null) => {
     editingTransaction.value = transaction;
@@ -97,6 +77,26 @@ const countryFlag = (code) => {
         img: `https://flagcdn.com/w40/${country.iso}.png`,
     };
 };
+
+const ledgerAccounts = computed(() => {
+    let runningBalance = 0;
+
+    return filteredAccounts.value.map((txn) => {
+        const amt = Number(txn.amount);
+
+        if (txn.type === "income") {
+            runningBalance += amt;
+        } else if (txn.type === "expense") {
+            runningBalance -= amt;
+        }
+
+        // Skip balance changes for transfer types
+        return {
+            ...txn,
+            balance: runningBalance,
+        };
+    });
+});
 </script>
 
 <template>
@@ -192,12 +192,14 @@ const countryFlag = (code) => {
                             <th class="px-6 py-3">Receipt #</th>
                             <th class="px-6 py-3">Type</th>
                             <th class="text-left px-5 py-3">Added By</th>
+                            <th class="px-6 py-3">Ledger Total</th>
+
                             <th class="px-6 py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
-                            v-for="(account, index) in filteredAccounts"
+                            v-for="(account, index) in ledgerAccounts"
                             :key="account.id"
                             class="border-b hover:bg-gray-50 text-center"
                         >
@@ -285,6 +287,9 @@ const countryFlag = (code) => {
                                     account.user_id
                                 }}</span> -->
                             </td>
+                            <td class="px-6 py-4 font-semibold text-gray-800">
+                                {{ account.balance.toLocaleString() }}
+                            </td>
                             <td class="px-6 py-4 text-center space-x-2">
                                 <div
                                     class="flex items-center justify-center gap-2"
@@ -314,7 +319,7 @@ const countryFlag = (code) => {
                                 </div>
                             </td>
                         </tr>
-                        <tr v-if="!filteredAccounts.length">
+                        <tr v-if="!ledgerAccounts.length">
                             <td
                                 colspan="6"
                                 class="text-center text-gray-500 py-6"
