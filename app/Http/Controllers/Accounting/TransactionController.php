@@ -21,7 +21,7 @@ class TransactionController extends Controller
             'incomes.upload',
             'expenses.upload'
         ])
-        ->latest()
+        ->orderByDESC('date')
         ->paginate(20);
 
         // Append image URL if exists

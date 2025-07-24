@@ -84,7 +84,7 @@ const ledgerAccounts = computed(() => {
     return filteredAccounts.value.map((txn) => {
         const amt = Number(txn.amount);
 
-        if (txn.type === "income") {
+        if (txn.type === "income" || txn.type === "opening_balance") {
             runningBalance += amt;
         } else if (txn.type === "expense") {
             runningBalance -= amt;
@@ -97,6 +97,48 @@ const ledgerAccounts = computed(() => {
         };
     });
 });
+
+// tfoot values
+const ledgerTotals = computed(() => {
+    let credit = 0;
+    let debit = 0;
+    let bankToCash = 0;
+    let cashToBank = 0;
+    let finalBalance = 0;
+
+    let runningBalance = 0;
+
+    const sorted = [...filteredAccounts.value].sort(
+        (a, b) => new Date(a.date) - new Date(b.date)
+    );
+
+    sorted.forEach((txn) => {
+        const amt = Number(txn.amount);
+
+        if (txn.type === 'income' || txn.type === 'opening_balance') {
+            credit += amt;
+            runningBalance += amt;
+        } else if (txn.type === 'expense') {
+            debit += amt;
+            runningBalance -= amt;
+        } else if (txn.type === 'bank_to_cash') {
+            bankToCash += amt;
+        } else if (txn.type === 'cash_to_bank') {
+            cashToBank += amt;
+        }
+    });
+
+    finalBalance = runningBalance;
+
+    return {
+        credit,
+        debit,
+        bankToCash,
+        cashToBank,
+        finalBalance,
+    };
+});
+
 </script>
 
 <template>
@@ -185,14 +227,16 @@ const ledgerAccounts = computed(() => {
                         <tr>
                             <th class="px-6 py-3">#</th>
                             <th class="px-6 py-3"></th>
-                            <th class="px-6 py-3">Amount</th>
                             <th class="px-6 py-3">Account</th>
                             <th class="text-left py-3">Country</th>
                             <th class="px-6 py-3">Date</th>
                             <th class="px-6 py-3">Receipt #</th>
-                            <th class="px-6 py-3">Type</th>
-                            <th class="text-left px-5 py-3">Added By</th>
-                            <th class="px-6 py-3">Ledger Total</th>
+                            <th class="px-6 py-3">Transaction</th>
+                            
+                            <th class="px-6 py-3">Cash In</th>
+<th class="px-6 py-3">Cash Out</th>
+
+                            <th class="px-6 py-3">Balance</th>
 
                             <th class="px-6 py-3">Action</th>
                         </tr>
@@ -230,7 +274,6 @@ const ledgerAccounts = computed(() => {
                                 </svg>
                             </td>
 
-                            <td class="px-6 py-4">{{ account.amount }}</td>
                             <td class="px-6 py-4">
                                 {{ account.sourceable?.name }}
                             </td>
@@ -277,20 +320,40 @@ const ledgerAccounts = computed(() => {
                                     }}
                                 </span>
                             </td>
-                            <td class="px-8 py-3 flex space-x-2">
-                                <img
-                                    :src="`https://i.pravatar.cc/40?u=${account.user_id}`"
-                                    class="w-10 h-10 rounded-full"
-                                    alt="User Avatar"
-                                />
-                                <!-- <span class="font-medium text-gray-800">{{
-                                    account.user_id
-                                }}</span> -->
-                            </td>
+                            
+                            <td class="px-6 py-4 text-green-600 font-medium">
+    <span v-if="account.type !== 'expense'">
+        {{ Number(account.amount).toLocaleString() }}
+    </span><span v-else>
+        0
+    </span>
+</td>
+<td class="px-6 py-4 text-red-600 font-medium">
+    <span v-if="account.type === 'expense'">
+        {{ Number(account.amount).toLocaleString() }}
+    </span>
+    <span v-else>
+        0
+    </span>
+</td>
+
                             <td class="px-6 py-4 font-semibold text-gray-800">
-                                {{ account.balance.toLocaleString() }}
+                                <span
+                                    v-if="
+                                        account.type != 'cash_to_bank' &&
+                                        account.type != 'bank_to_cash'
+                                    "
+                                >
+                                    {{ account.balance.toLocaleString() }}
+                                </span>
+                                <span v-else>
+                                    <i> <small>Conversion</small> </i>
+                                </span>
                             </td>
-                            <td class="px-6 py-4 text-center space-x-2">
+                            <td
+                                class="px-6 py-4 text-center space-x-2"
+                                v-if="account.type != ['opening_balance']"
+                            >
                                 <div
                                     class="flex items-center justify-center gap-2"
                                 >
@@ -318,6 +381,9 @@ const ledgerAccounts = computed(() => {
                                     />
                                 </div>
                             </td>
+                            <td v-else>
+                                <i><small>Opening Balance</small></i>
+                            </td>
                         </tr>
                         <tr v-if="!ledgerAccounts.length">
                             <td
@@ -328,6 +394,34 @@ const ledgerAccounts = computed(() => {
                             </td>
                         </tr>
                     </tbody>
+                    <tfoot class="bg-gray-50 font-semibold text-center text-sm">
+    <tr>
+        <td colspan="2" class="px-6 py-4 text-gray-700">
+            Bank → Cash:
+            <span class="text-blue-700">
+                {{ ledgerTotals.bankToCash.toLocaleString() }}
+            </span>
+        </td>
+        <td colspan="2" class="px-6 py-4 text-gray-700">
+            Cash → Bank:
+            <span class="text-blue-700">
+                {{ ledgerTotals.cashToBank.toLocaleString() }}
+            </span>
+        </td>
+        <td colspan="3" class="px-6 py-4 text-right">Totals:</td>
+        <td class="px-6 py-4 text-green-700">
+            {{ ledgerTotals.credit.toLocaleString() }}
+        </td>
+        <td class="px-6 py-4 text-red-700">
+            {{ ledgerTotals.debit.toLocaleString() }}
+        </td>
+        <td class="px-6 py-4 text-blue-700">
+            {{ ledgerTotals.finalBalance.toLocaleString() }}
+        </td>
+        <td></td>
+    </tr>
+</tfoot>
+
                 </table>
             </div>
 

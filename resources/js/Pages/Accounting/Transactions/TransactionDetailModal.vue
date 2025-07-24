@@ -10,6 +10,7 @@ const emit = defineEmits(["close"]);
 // Dynamic border color based on transaction type
 const borderColor = {
     income: "border-green-600",
+    opening_balance: "border-green-600",
     expense: "border-red-600",
     default: "border-yellow-600",
 };
@@ -49,7 +50,7 @@ const countryFlag = (code) => {
                 ]"
             >
                 <!-- Close Button -->
-                 <button
+                <button
                     class="absolute top-2 right-2 p-2 rounded-full hover:bg-gray-100 transition transform hover:scale-110"
                     @click="$emit('close')"
                     title="Close"
@@ -71,90 +72,76 @@ const countryFlag = (code) => {
                 </button>
 
                 <!-- Modal Header -->
+
                 <h2
-                    class="text-2xl font-bold mb-6 border-b pb-3 flex items-center gap-2"
-                    :class="{
-                        'text-green-700': transaction.type === 'income',
-                        'text-red-700': transaction.type === 'expense',
-                        'text-yellow-700':
-                            transaction.type !== 'income' &&
-                            transaction.type !== 'expense',
-                    }"
+                    class="text-2md font-bold mb-6 border-b pb-3 flex items-center justify-between"
                 >
-                    <svg
-                        class="w-6 h-6"
+                    <div
+                        class="flex items-center gap-2"
                         :class="{
-                            'text-green-500': transaction.type === 'income',
-                            'text-red-500': transaction.type === 'expense',
-                            'text-yellow-500':
-                                transaction.type !== 'income' &&
-                                transaction.type !== 'expense',
+                            'text-green-700': transaction.type === 'income',
+                            'text-green-800':
+                                transaction.type === 'opening_balance',
+                            'text-red-700': transaction.type === 'expense',
+                            'text-yellow-500': ![
+                                'income',
+                                'opening_balance',
+                                'expense',
+                            ].includes(transaction.type),
                         }"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        viewBox="0 0 24 24"
                     >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m4 0v-6a2 2 0 00-2-2H7a2 2 0 00-2 2v6m0 0h14"
-                        />
-                    </svg>
-                    Transaction Details
+                        <!-- Transaction Details -->
+                        <span
+                            :class="{
+                                'bg-green-100 text-green-800':
+                                    transaction.type === 'income' ||
+                                    transaction.type === 'opening_balance',
+                                'bg-red-100 text-red-800':
+                                    transaction.type === 'expense',
+                                'bg-yellow-100 text-yellow-500': ![
+                                    'income',
+                                    'opening_balance',
+                                    'expense',
+                                ].includes(transaction.type),
+                            }"
+                            class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium"
+                        >
+                            {{
+                                transaction.type
+                                    .replaceAll("_", " ")
+                                    .replace(/\b\w/g, (l) => l.toUpperCase())
+                            }}
+                        </span>
+                        <div class="text-sm text-gray-500">
+                            {{ transaction.date }}
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <img
+                                :src="
+                                    countryFlag(transaction.account_country).img
+                                "
+                                alt="flag"
+                                class="w-6 h-4 object-cover rounded shadow"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Optional Right Side Content (e.g. edit or date info) -->
                 </h2>
 
                 <!-- Info Grid -->
                 <div
-                    class="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm text-gray-700"
+                    class="flex flex-wrap items-center gap-x-8 gap-y-2 text-sm text-gray-700"
                 >
-                    <div class="flex items-center gap-2">
-                        <strong>Type:</strong>
-                        <span
-                            :class="{
-                                'bg-green-100 text-green-800':
-                                    transaction.type === 'income',
-                                'bg-red-100 text-red-800':
-                                    transaction.type === 'expense',
-                                'bg-yellow-100 text-yellow-800':
-                                    transaction.type !== 'income' &&
-                                    transaction.type !== 'expense',
-                            }"
-                            class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium"
-                        >
-                            {{ transaction.type.toUpperCase() }}
-                        </span>
-                    </div>
-
                     <div class="flex items-center gap-2">
                         <strong>Account:</strong>
                         {{ transaction.sourceable?.name || "N/A" }}
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <strong>Country:</strong>
-                        <img
-                            :src="countryFlag(transaction.account_country).img"
-                            alt="flag"
-                            class="w-6 h-4 object-cover rounded shadow"
-                        />
-                        <span>{{
-                            countryFlag(transaction.account_country).label
-                        }}</span>
+                        <strong>Amount:</strong>
+                        Rs. {{ transaction.amount }}
                     </div>
-
-                    <div class="flex items-center gap-2">
-                        <strong>Amount:</strong> Rs. {{ transaction.amount }}
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <strong>Date:</strong> {{ transaction.date }}
-                    </div>
-
-                    <!-- <div class="flex items-center gap-2">
-                        <strong>Reference:</strong>
-                        {{ transaction.reference || "—" }}
-                    </div> -->
 
                     <div class="flex items-center gap-2">
                         <strong>Description:</strong>
@@ -165,6 +152,7 @@ const countryFlag = (code) => {
                         <strong>Receipt No:</strong>
                         {{
                             transaction.incomes?.[0]?.receipt_no ||
+                            transaction.opening_balance?.[0]?.receipt_no ||
                             transaction.expenses?.[0]?.receipt_no ||
                             "—"
                         }}
@@ -191,18 +179,17 @@ const countryFlag = (code) => {
                         </svg>
                         Receipt Image:
                     </div>
- 
 
-                            <ImageZoomModal
-                                :show="showImageModal"
-                                :image="transaction.receipt_image_url"
-                                @close="showImageModal = false"
-                            />
+                    <ImageZoomModal
+                        :show="showImageModal"
+                        :image="transaction.receipt_image_url"
+                        @close="showImageModal = false"
+                    />
                     <img
                         v-if="transaction.receipt_image_url"
                         :src="transaction.receipt_image_url"
                         alt="Receipt"
-                         @click="openImageModal(transaction.receipt_image_url)"
+                        @click="openImageModal(transaction.receipt_image_url)"
                         class="max-h-64 rounded border hover:scale-105 transition-transform duration-300 h-24 mt-2 border rounded cursor-zoom-in"
                     />
                     <p v-else class="text-sm text-gray-400 italic">
@@ -223,5 +210,4 @@ const countryFlag = (code) => {
 .fade-leave-to {
     opacity: 0;
 }
-
 </style>

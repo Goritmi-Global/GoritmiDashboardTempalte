@@ -4,22 +4,25 @@ namespace App\Http\Controllers\Accounting;
 
 use App\Http\Controllers\Controller;
 use App\Models\Accounting\Cashbook;
+use App\Models\Accounting\Account;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-
+use DB;
 class CashbookController extends Controller
 {
     public function index()
     {
-        $cashbook = Cashbook::firstOrCreate([
-            'id' => 1,
-        ], [
-            'name' => 'Cash in Hand',
-            'balance' => 0,
-        ]);
+        // $cashbook = Cashbook::firstOrCreate([
+        //     'id' => 1,
+        // ], [
+        //     'name' => 'Cash in Hand',
+        //     'balance' => 0,
+        // ]);
  
+        
+      
         return Inertia::render('Accounting/Cashbook/Index', [
-            'cashbook' => $cashbook,
+            'cashbook' => Cashbook::first(),
         ]);
     }
 
@@ -28,17 +31,17 @@ class CashbookController extends Controller
         return Inertia::render('Accounting/Cashbook/Create');
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'balance' => 'required|numeric|min:0',
-        ]);
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'name' => 'required|string|max:255',
+    //         'balance' => 'required|numeric|min:0',
+    //     ]);
 
-        Cashbook::create($request->only('name', 'balance'));
+    //     Cashbook::create($request->only('name', 'balance'));
 
-        return redirect()->route('cashbook.index')->with('success', 'Cashbook created successfully.');
-    }
+    //     return redirect()->route('cashbook.index')->with('success', 'Cashbook created successfully.');
+    // }
 
     public function show(Cashbook $cashbook)
     {
@@ -55,17 +58,48 @@ class CashbookController extends Controller
     }
 
     public function update(Request $request, Cashbook $cashbook)
-    {
-        // dd("test");
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'balance' => 'required|numeric|min:0',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255|unique:cashbooks,name,' . $cashbook->id,
+        'balance' => 'nullable|numeric|min:0',
+    ]);
+
+    DB::transaction(function () use ($request, $cashbook) {
+         
+        $previousBalance = $cashbook->balance;
 
         $cashbook->update($request->only('name', 'balance'));
 
-        return redirect()->back()->with('success', 'Cashbook updated successfully.');
-    }
+        $existing_record = Account::where('sourceable_type', Cashbook::class)
+            ->where('sourceable_id', $cashbook->id)
+            ->where('type', 'opening_balance')
+            ->first();
+
+        if ($existing_record) {
+            $existing_record->update([
+                'amount' => $request->balance,
+                'description' => 'Updated Cashbook Balance From ' . $previousBalance . ' to ' . $request->balance,
+                'date' => now(),
+                'user_id' => auth()->id(),
+            ]);
+        } else {
+            Account::create([
+                'type' => 'opening_balance',
+                'amount' => $request->balance,
+                'description' => 'Initial Cashbook Balance set to ' . $request->balance,
+                'date' => now(),
+                'user_id' => auth()->id(),
+                'account_country' => 'PK', // or dynamic if needed
+                'cashbook_id' => $cashbook->id,
+                'sourceable_type' => Cashbook::class,
+                'sourceable_id' => $cashbook->id,
+            ]);
+        }
+    });
+
+    return redirect()->back()->with('success', 'Cashbook updated successfully.');
+}
+
 
     public function destroy(Cashbook $cashbook)
     {

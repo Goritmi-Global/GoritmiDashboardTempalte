@@ -66,21 +66,7 @@ const exportToExcel = () => alert("Export to Excel triggered");
     <div
         class="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4"
     >
-        <!-- Metrics -->
-        <div class="flex items-center flex-1 space-x-4 text-sm">
-            <h5>
-                <span class="text-gray-500">All:</span>
-                {{ filteredAccounts.length }}
-            </h5>
-            <h5>
-                <span class="text-gray-500">Expenses:</span> {{ totalExpense }}
-            </h5>
-            <h5>
-                <span class="text-gray-500">Income:</span> {{ totalIncome }}
-            </h5>
-            <h5><span class="text-gray-500">Capital:</span> {{ capital }}</h5>
-        </div>
-
+        
         <!-- Search -->
         <div class="w-full md:w-1/2">
             <div class="relative w-full">
@@ -161,6 +147,10 @@ const exportToExcel = () => alert("Export to Excel triggered");
                                     {
                                         label: 'Bank to Cash',
                                         value: 'bank_to_cash',
+                                    },
+                                    {
+                                        label: 'Opening Balance',
+                                        value: 'opening_balance',
                                     },
                                 ]"
                                 :key="option.value"
