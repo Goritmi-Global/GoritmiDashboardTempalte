@@ -7,214 +7,230 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 
-// ✅ use `reports` from backend
-const props = defineProps({
-    reports: Array,
-});
+const props = defineProps({ reports: Array });
 
-// Filters
 const search = ref("");
 const typeFilter = ref(["income"]);
 const year = ref("");
 const month = ref("");
 const dateRange = ref({ from: "", to: "" });
 
-// Filtered data
+const filterType = computed(() => {
+  if (year.value && !month.value && !dateRange.value.from) return "yearly";
+  if (year.value && month.value) return "monthly";
+  if (dateRange.value.from && dateRange.value.to) return "custom";
+  return "none";
+});
+
 const filteredReports = computed(() => {
-    const term = search.value.toLowerCase();
-
-    return props.reports.filter((item) => {
-        const txnDate = new Date(item.date);
-
-        const matchesSearch = [
-            item.description,
-            item.amount,
-            item.account_country,
-            item.date,
-            item.incomes?.[0]?.receipt_no ?? item.expenses?.[0]?.receipt_no ?? "",
-        ].some((val) => val?.toString().toLowerCase().includes(term));
-
-        const matchesYear = !year.value || txnDate.getFullYear() === parseInt(year.value);
-        const matchesMonth = !month.value || txnDate.getMonth() + 1 === parseInt(month.value);
-
-        const from = dateRange.value.from ? new Date(dateRange.value.from) : null;
-        const to = dateRange.value.to ? new Date(dateRange.value.to) : null;
-        const matchesCustomRange =
-            (!from || txnDate >= from) && (!to || txnDate <= to);
-
-        return matchesSearch && matchesYear && matchesMonth && matchesCustomRange;
-    });
+  return props.reports.filter((item) => {
+    const date = new Date(item.date);
+    const from = dateRange.value.from ? new Date(dateRange.value.from) : null;
+    const to = dateRange.value.to ? new Date(dateRange.value.to) : null;
+    const matchesYear = !year.value || date.getFullYear() === parseInt(year.value);
+    const matchesMonth = !month.value || date.getMonth() + 1 === parseInt(month.value);
+    const matchesCustom = (!from || date >= from) && (!to || date <= to);
+    return matchesYear && matchesMonth && matchesCustom;
+  });
 });
 
-// Summary totals
-const ledgerTotals = computed(() => {
-    let credit = 0;
-    filteredReports.value.forEach((i) => {
-        credit += Number(i.amount);
-    });
-    return {
-        credit,
-        finalBalance: credit,
-    };
-});
+const groupedData = computed(() => {
+  const map = new Map();
+  let balance = 0;
 
-// Accounts for toolbar
-const mappedAccounts = computed(() => props.reports.map((i) => i));
+  const keyFn = (item) => {
+    const date = new Date(item.date);
+    if (filterType.value === "yearly") return `${date.toLocaleString("default", { month: "long" })} ${date.getFullYear()}`;
+    return item.date;
+  };
 
-// Export PDF
-const exportPdf = () => {
-    const doc = new jsPDF();
-    doc.text("Income Report", 14, 16);
-    autoTable(doc, {
-        head: [["#", "Account", "Receipt #", "Date", "Description", "Amount"]],
-        body: filteredReports.value.map((item, i) => [
-            i + 1,
-            item.sourceable?.name || "N/A",
-            item.incomes?.[0]?.receipt_no || item.expenses?.[0]?.receipt_no || "—",
-            item.date,
-            item.description || "—",
-            item.amount.toLocaleString(),
-        ]),
-    });
-    doc.save("report.pdf");
-};
-
-// Export Excel
-const exportExcel = () => {
-    const data = filteredReports.value.map((item, i) => ({
-        "#": i + 1,
-        Account: item.sourceable?.name || "N/A",
-        "Receipt #": item.incomes?.[0]?.receipt_no || item.expenses?.[0]?.receipt_no || "—",
-        Date: item.date,
-        Description: item.description || "—",
-        Amount: item.amount,
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
-    XLSX.writeFile(workbook, "report.xlsx");
-};
-
-// Print Table
-const printTable = () => {
-    const printContent = document.getElementById("income-report-table")?.outerHTML;
-    const printWindow = window.open("", "_blank");
-    if (printWindow) {
-        printWindow.document.write(`
-            <html>
-            <head><title>Print Report</title></head>
-            <body>
-                <h2>Report</h2>
-                ${printContent}
-            </body>
-            </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
+  filteredReports.value.forEach((item) => {
+    const key = keyFn(item);
+    if (!map.has(key)) map.set(key, { date: key, income: 0, expense: 0 });
+    if (item.type === "income" || item.type === "opening_balance") {
+      map.get(key).income += Number(item.amount);
+    } else if (item.type === "expense") {
+      map.get(key).expense += Number(item.amount);
     }
+  });
+
+  const grouped = Array.from(map.values()).sort((a, b) => new Date(a.date) - new Date(b.date));
+  grouped.forEach((entry) => {
+    balance += entry.income - entry.expense;
+    entry.balance = balance;
+  });
+  return grouped;
+});
+
+const reportTitle = computed(() => {
+  if (filterType.value === "yearly") return `Report for Year ${year.value}`;
+  if (filterType.value === "monthly") return `Report for ${new Date(0, month.value - 1).toLocaleString("default", { month: "long" })} ${year.value}`;
+  if (filterType.value === "custom") return `Report from ${dateRange.value.from} to ${dateRange.value.to}`;
+  return "Accounting Report";
+});
+
+const totals = computed(() => {
+  let income = 0,
+    expense = 0,
+    balance = 0;
+  groupedData.value.forEach((item) => {
+    income += item.income;
+    expense += item.expense;
+    balance = item.balance;
+  });
+  return { income, expense, balance };
+});
+
+const exportPdf = () => {
+  const doc = new jsPDF();
+  doc.setFontSize(14);
+  doc.text(reportTitle.value, 14, 16);
+
+  autoTable(doc, {
+    startY: 22,
+    head: [["#", filterType.value === "yearly" ? "Month" : "Date", "Income", "Expense", "Balance"]],
+    body: groupedData.value.map((item, i) => [
+      i + 1,
+      item.date,
+      item.income.toLocaleString(),
+      item.expense.toLocaleString(),
+      item.balance.toLocaleString(),
+    ]),
+    styles: { halign: "center" },
+  });
+
+  const finalY = doc.lastAutoTable.finalY || 30;
+
+  doc.setFontSize(12);
+  doc.text(`Total Income: Rs. ${totals.value.income.toLocaleString()}`, 14, finalY + 12);
+  doc.text(`Total Expense: Rs. ${totals.value.expense.toLocaleString()}`, 14, finalY + 20);
+  doc.setTextColor(28, 13, 130); // Blue
+  doc.text(`Final Balance: Rs. ${totals.value.balance.toLocaleString()}`, 14, finalY + 28);
+  doc.save("accounting-report.pdf");
 };
+
+
+const exportExcel = () => {
+  const data = groupedData.value.map((item, i) => ({
+    "#": i + 1,
+    [filterType.value === "yearly" ? "Month" : "Date"]: item.date,
+    Income: item.income,
+    Expense: item.expense,
+    Balance: item.balance,
+  }));
+
+  data.push({
+    "#": "",
+    [filterType.value === "yearly" ? "Month" : "Date"]: "TOTAL",
+    Income: totals.value.income,
+    Expense: totals.value.expense,
+    Balance: totals.value.balance,
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+  XLSX.writeFile(workbook, "accounting-report.xlsx");
+};
+
+
+const printTable = () => {
+  const content = document.getElementById("report-table")?.outerHTML;
+  const w = window.open("", "_blank");
+  if (w) {
+    w.document.write(`
+      <html>
+        <head>
+          <title>Print Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+            th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+            th { background-color: #f0f0f0; }
+            .totals { font-size: 16px; margin-top: 20px; }
+            .totals div { margin-bottom: 8px; }
+          </style>
+        </head>
+        <body>
+          <h2>${reportTitle.value}</h2>
+          ${content}
+          <div class="totals">
+            <div><strong>Total Income:</strong> Rs. ${totals.value.income.toLocaleString()}</div>
+            <div><strong>Total Expense:</strong> Rs. ${totals.value.expense.toLocaleString()}</div>
+            <div><strong>Final Balance:</strong> <span style="color: #1C0D82;"><strong>Rs. ${totals.value.balance.toLocaleString()}</strong></span></div>
+          </div>
+        </body>
+      </html>
+    `);
+    w.document.close();
+    w.print();
+  }
+};
+
 </script>
 
 <template>
-    <Head title="Accounting Report" />
-    <AppLayout>
-        <div class="p-6 space-y-6">
-            <div>
-                <h1 class="text-2xl font-bold">Accounting Report</h1>
-                <p class="text-sm text-gray-500">
-                    Total Records: {{ filteredReports.length }} |
-                    Total Amount: Rs. {{ ledgerTotals.credit.toLocaleString() }}
-                </p>
-            </div>
+  <Head title="Accounting Report" />
+  <AppLayout>
+    <div class="p-6 space-y-6">
+      <div>
+        <h1 class="text-2xl font-bold">{{ reportTitle }}</h1>
+        <p class="text-sm text-gray-500">
+          Total Records: {{ groupedData.length }} |
+          Income: Rs. {{ totals.income.toLocaleString() }} |
+          Expense: Rs. {{ totals.expense.toLocaleString() }} |
+          Balance: Rs. {{ totals.balance.toLocaleString() }}
+        </p>
+      </div>
 
-            <!-- Filter Toolbar -->
-            <div class="bg-white shadow rounded-lg overflow-hidden">
-                <FilterToolbar
-                    :accounts="{ data: mappedAccounts }"
-                    v-model:search="search"
-                    v-model:typeFilter="typeFilter"
-                    v-model:year="year"
-                    v-model:month="month"
-                    v-model:dateRange="dateRange"
-                    :showFilter="false"
-                    :showExport="true"
-                    @exportPdf="exportPdf"
-                    @exportExcel="exportExcel"
-                    @print="printTable"
-                />
+      <div class="bg-white shadow rounded-lg overflow-hidden">
+        <FilterToolbar
+          v-model:search="search"
+          v-model:typeFilter="typeFilter"
+          v-model:year="year"
+          v-model:month="month"
+          v-model:dateRange="dateRange"
+          :showFilter="false"
+          :showExport="true"
+          @exportPdf="exportPdf"
+          @exportExcel="exportExcel"
+          @print="printTable"
+        />
 
-                <!-- Report Table -->
-                <div class="overflow-auto">
-                    <table
-                        id="income-report-table"
-                        class="min-w-full divide-y divide-gray-200 text-sm text-left text-gray-600"
-                    >
-                        <thead class="bg-gray-100 text-xs text-gray-700 uppercase text-center">
-                            <tr>
-                                <th class="px-4 py-2">#</th>
-                                <th class="px-4 py-2">Account</th>
-                                <th class="px-4 py-2">Receipt #</th>
-                                <th class="px-4 py-2">Date</th>
-                                <th class="px-4 py-2">Transaction</th>
-                                <th class="px-4 py-2">Description</th>
-                                <th class="px-4 py-2">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="(item, index) in filteredReports"
-                                :key="item.id"
-                                class="text-center border-b"
-                            >
-                                <td class="px-4 py-3">{{ index + 1 }}</td>
-                                <td class="px-4 py-3">
-                                    {{ item.sourceable?.name || "N/A" }}
-                                </td>
-                                <td class="px-4 py-3">
-                                    {{
-                                        item.incomes?.[0]?.receipt_no ||
-                                        item.expenses?.[0]?.receipt_no ||
-                                        "—"
-                                    }}
-                                </td>
-
-                                <td class="px-4 py-3">{{ item.date }}</td>
-                                <td class="px-4 py-3">
-                                  {{
-                                        item.type
-                                            .replaceAll("_", " ")
-                                            .replace(/\b\w/g, (l) =>
-                                                l.toUpperCase()
-                                            )
-                                    }}
-                                </td>
-                                <td class="px-4 py-3">
-                                    {{ item.description || "—" }}
-                                </td>
-                                <td class="px-4 py-3 text-green-600 font-semibold">
-                                    {{ Number(item.amount).toLocaleString() }}
-                                </td>
-                            </tr>
-                            <tr v-if="!filteredReports.length">
-                                <td colspan="6" class="text-center text-gray-500 py-6">
-                                    No records found.
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot class="bg-gray-50 font-semibold text-center text-sm">
-                            <tr>
-                                <td colspan="6" class="px-6 py-4 text-right">
-                                    Total Amount:
-                                </td>
-                                <td colspan="2" class="px-6 py-4 text-green-700">
-                                    {{ ledgerTotals.credit.toLocaleString() }}
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
+        <div class="overflow-auto">
+          <table id="report-table" class="min-w-full text-sm text-gray-600 text-center">
+            <thead class="bg-gray-100 text-xs text-gray-700 uppercase">
+              <tr>
+                <th class="px-4 py-2">#</th>
+                <th class="px-4 py-2">{{ filterType === 'yearly' ? 'Month' : 'Date' }}</th>
+                <th class="px-4 py-2">Income</th>
+                <th class="px-4 py-2">Expense</th>
+                <th class="px-4 py-2">Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in groupedData" :key="index" class="border-b">
+                <td class="px-4 py-2">{{ index + 1 }}</td>
+                <td class="px-4 py-2">{{ item.date }}</td>
+                <td class="px-4 py-2 text-green-600 font-semibold">{{ item.income.toLocaleString() }}</td>
+                <td class="px-4 py-2 text-red-600 font-semibold">{{ item.expense.toLocaleString() }}</td>
+                <td class="px-4 py-2 text-blue-600 font-semibold">{{ item.balance.toLocaleString() }}</td>
+              </tr>
+              <tr v-if="!groupedData.length">
+                <td colspan="5" class="text-center text-gray-500 py-6">No records found.</td>
+              </tr>
+            </tbody>
+            <tfoot class="bg-gray-50 font-semibold text-sm">
+              <tr>
+                <td colspan="2" class="text-right px-4 py-2">Total</td>
+                <td class="text-green-700 px-4 py-2">{{ totals.income.toLocaleString() }}</td>
+                <td class="text-red-700 px-4 py-2">{{ totals.expense.toLocaleString() }}</td>
+                <td class="text-blue-700 px-4 py-2">{{ totals.balance.toLocaleString() }}</td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
-    </AppLayout>
+      </div>
+    </div>
+  </AppLayout>
 </template>

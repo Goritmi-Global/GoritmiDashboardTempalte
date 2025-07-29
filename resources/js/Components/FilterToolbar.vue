@@ -202,31 +202,39 @@ const exportToExcel = () => alert("Export to Excel triggered");
             </div>
 
             <!-- Export Dropdown -->
-            <div class="relative">
-                <button
-                    @click="localShowExport = !localShowExport"
-                    class="border px-3 py-2 text-sm rounded-md"
-                >
-                    Export
-                </button>
-                <div
-                    v-if="localShowExport"
-                    class="absolute mt-2 right-0 bg-white rounded shadow p-2 w-40 z-10"
-                >
-                    <button
-                        @click="exportToPDF"
-                        class="block w-full text-left px-2 py-1 hover:bg-gray-100"
-                    >
-                        📄 Export PDF
-                    </button>
-                    <button
-                        @click="exportToExcel"
-                        class="block w-full text-left px-2 py-1 hover:bg-gray-100"
-                    >
-                        📊 Export Excel
-                    </button>
-                </div>
-            </div>
+           <!-- Export Dropdown -->
+<div class="relative">
+    <button
+        @click="localShowExport = !localShowExport"
+        class="border px-3 py-2 text-sm rounded-md"
+    >
+        Export
+    </button>
+    <div
+        v-if="localShowExport"
+        class="absolute mt-2 right-0 bg-white rounded shadow p-2 w-40 z-10"
+    >
+        <button
+            @click="$emit('exportPdf')"
+            class="block w-full text-left px-2 py-1 hover:bg-gray-100"
+        >
+            📄 Export PDF
+        </button>
+        <button
+            @click="$emit('exportExcel')"
+            class="block w-full text-left px-2 py-1 hover:bg-gray-100"
+        >
+            📊 Export Excel
+        </button>
+        <button
+            @click="$emit('print')"
+            class="block w-full text-left px-2 py-1 hover:bg-gray-100"
+        >
+            🖨️ Print
+        </button>
+    </div>
+</div>
+
         </div>
     </div>
 </template>
