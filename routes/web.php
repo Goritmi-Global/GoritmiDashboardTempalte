@@ -20,7 +20,8 @@ use App\Http\Controllers\Accounting\{
     BankController,
     CashbookController,
     ForecastingController,
-    TransactionController
+    TransactionController,
+    ReportController
 };
 
 Route::resource('expense-types', ExpenseTypeController::class);
@@ -130,6 +131,11 @@ Route::prefix('accounting')
         Route::resource('transactions', TransactionController::class); // ← now this becomes `accounting.transactions.*`
         Route::resource('cashbooks', CashbookController::class);
         Route::put('cashbook/{cashbook}', [CashbookController::class, 'update'])->name('cashbook.update');
+
+
+        Route::resource('reports', ReportController::class);
+
+
     });
 
 

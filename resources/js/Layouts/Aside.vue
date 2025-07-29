@@ -30,20 +30,6 @@
                     small
                 />
                 <NavItem
-                    icon="credit-card"
-                    text="Expense Types"
-                    href="/accounting/expense-types"
-                    :active="route().current('accounting.expense-types.index')"
-                    small
-                />
-                <NavItem
-                    icon="wallet"
-                    text="Income Types"
-                    href="/accounting/income-types"
-                    :active="route().current('accounting.income-types.index')"
-                    small
-                />
-                <NavItem
                     icon="arrow-trending-down"
                     text="Expenses"
                     href="/accounting/expenses"
@@ -64,6 +50,32 @@
                     :active="route().current('accounting.accounts.index')"
                     small
                 />
+
+                <NavItem
+  icon="chart-bar"
+  text="Reports"
+  href="/accounting/reports"
+  :active="route().current('accounting.reports.index')"
+  small
+/>
+
+
+
+                <NavItem
+                    icon="credit-card"
+                    text="Expense Types"
+                    href="/accounting/expense-types"
+                    :active="route().current('accounting.expense-types.index')"
+                    small
+                />
+                <NavItem
+                    icon="wallet"
+                    text="Income Types"
+                    href="/accounting/income-types"
+                    :active="route().current('accounting.income-types.index')"
+                    small
+                />
+
                 <NavItem
                     icon="building-library"
                     text="Banks"
@@ -213,7 +225,8 @@ const accountingOpen = ref(
         route().current("accounting.accounts.index") ||
         route().current("accounting.banks.index") ||
         route().current("accounting.cashbooks.index") ||
-        route().current("accounting.forecastings.index")
+        route().current("accounting.forecastings.index")||
+        route().current("accounting.reports.index")
 );
 
 const isAccountingActive = computed(() => accountingOpen.value);
