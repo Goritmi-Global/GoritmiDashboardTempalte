@@ -93,8 +93,8 @@
                 <NavItem
                     icon="chart-bar"
                     text="Forecasting"
-                    href="/accounting/forecastings"
-                    :active="route().current('accounting.forecastings.index')"
+                    href="/accounting/forecasting"
+                    :active="route().current('forecasting')"
                     small
                 />
             </DisclosureItem>
@@ -225,8 +225,9 @@ const accountingOpen = ref(
         route().current("accounting.accounts.index") ||
         route().current("accounting.banks.index") ||
         route().current("accounting.cashbooks.index") ||
-        route().current("accounting.forecastings.index")||
+        route().current("accounting.forecasting") ||
         route().current("accounting.reports.index")
+        
 );
 
 const isAccountingActive = computed(() => accountingOpen.value);

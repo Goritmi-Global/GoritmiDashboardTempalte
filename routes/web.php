@@ -134,6 +134,10 @@ Route::prefix('accounting')
 
 
         Route::resource('reports', ReportController::class);
+Route::get('forecasting', [ReportController::class, 'generateMonthlyExpenseForecast'])
+     ->name('forecasting.index');
+ 
+
 
 
     });
