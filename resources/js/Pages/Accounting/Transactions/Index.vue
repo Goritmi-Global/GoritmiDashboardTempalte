@@ -157,6 +157,17 @@ const year = ref("");
 const month = ref("");
 const dateRange = ref({ from: "", to: "" });
 
+const filteredIncomeTotal = computed(() =>
+    filteredAccounts.value
+        .filter((a) => a.type === "income")
+        .reduce((sum, a) => sum + Number(a.amount), 0)
+);
+
+const filteredExpenseTotal = computed(() =>
+    filteredAccounts.value
+        .filter((a) => a.type === "expense")
+        .reduce((sum, a) => sum + Number(a.amount), 0)
+);
 
 </script>
 

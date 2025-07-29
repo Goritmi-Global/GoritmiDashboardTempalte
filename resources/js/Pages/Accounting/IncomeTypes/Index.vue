@@ -4,6 +4,8 @@ import { Head, router } from "@inertiajs/vue3";
 import { ref, computed } from "vue";
 import { Pencil, Plus, KeyRound, Trash2 } from "lucide-vue-next";
 import { toast } from "vue3-toastify";
+import { Link } from "@inertiajs/vue3";
+
 
 import IncomeTypeFormModal from "./IncomeTypeFormModal.vue";
 
@@ -159,9 +161,15 @@ const refresh = () => {
                             class="border-b hover:bg-gray-50"
                         >
                             <td class="px-6 py-4">{{ index + 1 }}</td>
-                            <td class="px-6 py-4 font-semibold">
-                                {{ type.name }}
-                            </td>
+                            <td class="px-6 py-4 text-blue-600 cursor-pointer hover:underline">
+    <Link
+        :href="route('accounting.income-types.details', type.id)"
+        class="text-blue-600 hover:underline"
+    >
+        {{ type.name }}
+    </Link>
+</td>
+
                             <td class="px-6 py-4">
                                 {{ type.description || "-" }}
                             </td>

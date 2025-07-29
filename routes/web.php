@@ -116,8 +116,14 @@ Route::prefix('accounting')
     ->group(function () {
         Route::resource('expense-types', ExpenseTypeController::class)->except(['show']);
         Route::resource('income-types', IncomeTypeController::class)->except(['show']);
+
         Route::resource('expenses', ExpenseController::class);
+        Route::get('/accounting/expense-types/{id}/details', [ExpenseTypeController::class, 'details'])->name('expense-types.details');
+
         Route::resource('incomes', IncomeController::class);
+        Route::get('/accounting/income-types/{id}/details', [IncomeTypeController::class, 'details'])->name('income-types.details');
+    
+
         Route::resource('accounts', AccountController::class);
         Route::resource('banks', BankController::class);
         Route::resource('forecastings', ForecastingController::class);

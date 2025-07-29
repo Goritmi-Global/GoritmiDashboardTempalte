@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Accounting\IncomeType;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+ 
+use App\Models\Accounting\Income;
+use App\Models\Accounting\Account;
 
 class IncomeTypeController extends Controller
 {
@@ -61,4 +64,38 @@ class IncomeTypeController extends Controller
             ], 500);
         }
     }
+
+    public function details($id)
+{
+    $type = IncomeType::findOrFail($id);
+
+    // Step 1: Fetch all incomes of this type
+    $incomes = Income::where('income_type_id', $id)->get();
+
+    // Step 2: Get account IDs from those incomes
+    $accountIds = $incomes->pluck('account_id')->unique();
+
+    // Step 3: Fetch related accounts
+    $accounts = Account::with('sourceable')
+        ->whereIn('id', $accountIds)
+        ->get()
+        ->keyBy('id');
+
+    // Step 4: Attach account to each income
+    $incomesWithAccounts = $incomes->map(function ($income) use ($accounts) {
+        $income->account = $accounts[$income->account_id] ?? null;
+        return $income;
+    });
+
+    // Step 5: Totals
+    $total = $incomesWithAccounts->sum(fn($i) => $i->account?->amount ?? 0);
+
+    return Inertia::render('Accounting/IncomeTypes/Details', [
+        'type' => $type,
+        'incomes' => $incomesWithAccounts,
+        'totalAmount' => $total,
+        'incomeCount' => $incomesWithAccounts->count(),
+    ]);
+}
+
 }

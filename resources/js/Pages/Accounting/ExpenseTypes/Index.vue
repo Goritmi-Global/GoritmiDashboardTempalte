@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Head, router } from "@inertiajs/vue3";
+import { Head, router, Link } from "@inertiajs/vue3";
 import { ref, computed } from "vue";
 import { Pencil, Plus, KeyRound, Trash2 } from "lucide-vue-next";
 import { toast } from "vue3-toastify";
@@ -161,9 +161,18 @@ const refresh = () => {
                             class="border-b hover:bg-gray-50"
                         >
                             <td class="px-6 py-4">{{ index + 1 }}</td>
-                            <td class="px-6 py-4 font-semibold">
-                                {{ type.name }}
+                            <td
+                                class="px-6 py-4   text-blue-600 cursor-pointer hover:underline"
+                            >
+                                <Link
+                                    :href="
+                                        route('accounting.expense-types.details', type.id)
+                                    "
+                                >   
+                                    {{ type.name }}
+                                </Link>
                             </td>
+
                             <td class="px-6 py-4">
                                 {{ type.description || "-" }}
                             </td>
