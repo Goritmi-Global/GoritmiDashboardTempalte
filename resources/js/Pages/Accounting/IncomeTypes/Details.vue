@@ -63,7 +63,7 @@ const filteredTotal = computed(() =>
         <div class="p-6 space-y-6">
             <h1 class="text-2xl font-bold">Income Type: {{ type.name }}</h1>
             <p class="text-sm text-gray-500">
-                Total Records: {{ incomeCount }} | Total Amount: Rs.
+                Overall Records: {{ incomeCount }} | Overall Total Amount: Rs.
                 {{ totalAmount.toLocaleString() }}
             </p>
 
