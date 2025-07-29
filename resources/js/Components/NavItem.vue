@@ -16,6 +16,8 @@
 
 <script setup>
 import { Link } from "@inertiajs/vue3";
+ 
+
 import {
   HomeIcon,
   BanknotesIcon,
@@ -25,7 +27,18 @@ import {
   BriefcaseIcon,
   PlusIcon,
   HandThumbUpIcon,
+  DocumentIcon,
+  ArrowsRightLeftIcon,
+  CreditCardIcon,
+  WalletIcon,
+  ArrowTrendingDownIcon,
+  ArrowTrendingUpIcon,
+  RectangleStackIcon,
+  BuildingLibraryIcon,
+  CurrencyDollarIcon,  
+  ChartBarIcon
 } from "@heroicons/vue/24/outline";
+
 
 const props = defineProps({
   icon: String,
@@ -44,5 +57,18 @@ const iconMap = {
   briefcase: BriefcaseIcon,
   plus: PlusIcon,
   "hand-thumb-up": HandThumbUpIcon,
+  document: DocumentIcon,
+  "arrows-right-left": ArrowsRightLeftIcon,
+  "credit-card": CreditCardIcon,
+  wallet: WalletIcon,
+  "arrow-trending-down": ArrowTrendingDownIcon,
+  "arrow-trending-up": ArrowTrendingUpIcon,
+  "rectangle-stack": RectangleStackIcon,
+  "building-library": BuildingLibraryIcon,
+  cash: CurrencyDollarIcon, // ✅ fixed here
+  "chart-bar": ChartBarIcon,
 };
+
+
+ 
 </script>

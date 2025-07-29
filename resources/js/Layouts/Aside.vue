@@ -16,77 +16,76 @@
             />
 
             <DisclosureItem
-    icon="banknotes"
-    text="Accounting"
-    :open="accountingOpen"
-    @toggle="accountingOpen = !accountingOpen"
-    :active="isAccountingActive"
->
-    <NavItem
-        icon="document"
-        text="Transactions"
-        href="/accounting/transactions"
-        :active="route().current('transactions.index')"
-        small
-    />
-    <NavItem
-        icon="document"
-        text="Expense Types"
-        href="/accounting/expense-types"
-        :active="route().current('expense-types.index')"
-        small
-    />
-    <NavItem
-        icon="document"
-        text="Income Types"
-        href="/accounting/income-types"
-        :active="route().current('income-types.index')"
-        small
-    />
-    <NavItem
-        icon="document"
-        text="Expenses"
-        href="/accounting/expenses"
-        :active="route().current('expenses.index')"
-        small
-    />
-    <NavItem
-        icon="document"
-        text="Incomes"
-        href="/accounting/incomes"
-        :active="route().current('incomes.index')"
-        small
-    />
-    <NavItem
-        icon="document"
-        text="Accounts"
-        href="/accounting/accounts"
-        :active="route().current('accounts.index')"
-        small
-    />
-    <NavItem
-        icon="document"
-        text="Banks"
-        href="/accounting/banks"
-        :active="route().current('banks.index')"
-        small
-    />
-    <NavItem
-        icon="document"
-        text="Cashbooks"
-        href="/accounting/cashbooks"
-        :active="route().current('cashbooks.index')"
-        small
-    />
-    <NavItem
-        icon="document"
-        text="Forecasting"
-        href="/accounting/forecastings"
-        :active="route().current('forecastings.index')"
-        small
-    />
-</DisclosureItem>
-
+                icon="banknotes"
+                text="Accounting"
+                :open="accountingOpen"
+                @toggle="accountingOpen = !accountingOpen"
+                :active="isAccountingActive"
+            >
+                <NavItem
+                    icon="arrows-right-left"
+                    text="Transactions"
+                    href="/accounting/transactions"
+                    :active="route().current('accounting.transactions.index')"
+                    small
+                />
+                <NavItem
+                    icon="credit-card"
+                    text="Expense Types"
+                    href="/accounting/expense-types"
+                    :active="route().current('accounting.expense-types.index')"
+                    small
+                />
+                <NavItem
+                    icon="wallet"
+                    text="Income Types"
+                    href="/accounting/income-types"
+                    :active="route().current('accounting.income-types.index')"
+                    small
+                />
+                <NavItem
+                    icon="arrow-trending-down"
+                    text="Expenses"
+                    href="/accounting/expenses"
+                    :active="route().current('accounting.expenses.index')"
+                    small
+                />
+                <NavItem
+                    icon="arrow-trending-up"
+                    text="Incomes"
+                    href="/accounting/incomes"
+                    :active="route().current('accounting.incomes.index')"
+                    small
+                />
+                <NavItem
+                    icon="rectangle-stack"
+                    text="Accounts"
+                    href="/accounting/accounts"
+                    :active="route().current('accounting.accounts.index')"
+                    small
+                />
+                <NavItem
+                    icon="building-library"
+                    text="Banks"
+                    href="/accounting/banks"
+                    :active="route().current('accounting.banks.index')"
+                    small
+                />
+                <NavItem
+                    icon="cash"
+                    text="Cashbooks"
+                    href="/accounting/cashbooks"
+                    :active="route().current('accounting.cashbooks.index')"
+                    small
+                />
+                <NavItem
+                    icon="chart-bar"
+                    text="Forecasting"
+                    href="/accounting/forecastings"
+                    :active="route().current('accounting.forecastings.index')"
+                    small
+                />
+            </DisclosureItem>
 
             <NavItem
                 icon="user-group"
@@ -173,17 +172,6 @@ import { computed, ref } from "vue";
 import NavItem from "@/Components/NavItem.vue";
 import DisclosureItem from "@/Components/DisclosureItem.vue";
 
-import {
-    HomeIcon,
-    BanknotesIcon,
-    UserGroupIcon,
-    FolderIcon,
-    BriefcaseIcon,
-    PlusIcon,
-    HandThumbUpIcon,
-    DocumentIcon,
-} from "@heroicons/vue/24/outline";
-
 const props = defineProps({
     sidebarOpen: Boolean,
 });
@@ -217,19 +205,16 @@ const isUserSubmenuActive = computed(
         route().current("roles-permissions")
 );
 const accountingOpen = ref(
-    route().current('transactions.index') ||
-    route().current('expense-types.index') ||
-    route().current('income-types.index') ||
-    route().current('expenses.index') ||
-    route().current('incomes.index') ||
-    route().current('accounts.index') ||
-    route().current('banks.index') ||
-    route().current('cashbooks.index') ||
-    route().current('forecastings.index')
+    route().current("accounting.transactions.index") ||
+        route().current("accounting.expense-types.index") ||
+        route().current("accounting.income-types.index") ||
+        route().current("accounting.expenses.index") ||
+        route().current("accounting.incomes.index") ||
+        route().current("accounting.accounts.index") ||
+        route().current("accounting.banks.index") ||
+        route().current("accounting.cashbooks.index") ||
+        route().current("accounting.forecastings.index")
 );
 
-const isAccountingActive = computed(() =>
-    accountingOpen.value
-);
-
+const isAccountingActive = computed(() => accountingOpen.value);
 </script>
