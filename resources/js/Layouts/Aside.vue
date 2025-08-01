@@ -261,12 +261,17 @@ const isAccountingActive = computed(() => accountingOpen.value);
 
 const hrOpen = ref(
     route().current("hr.departments.index") ||
-        route().current("hr.employees.index")
+    route().current("hr.employees.index") ||
+    route().current("hr.employees.create") ||
+    route().current("hr.employees.show") ||
+    route().current("hr.employees.edit") ||
+    route().current("hr.employees.joining") ||
+    route().current("hr.employees.salaries") ||
+    route().current("hr.employees.departments")
 );
 
-const isHRActive = computed(
-    () =>
-        route().current("hr.departments.index") ||
-        route().current("hr.employees.index")
-);
+const isHRActive = computed(() => hrOpen.value);
+
+
+ 
 </script>

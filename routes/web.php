@@ -151,26 +151,31 @@ Route::get('forecasting', [ReportController::class, 'generateMonthlyExpenseForec
     
 
     Route::prefix('hr/employees')->name('hr.employees.')->group(function () {
-    Route::get('/', [EmployeeController::class, 'index'])->name('index');
-    Route::get('/create', [EmployeeController::class, 'create'])->name('create');
-    Route::post('/', [EmployeeController::class, 'store'])->name('store');
-    Route::get('{id}', [EmployeeController::class, 'show'])->name('show');
-    Route::get('{id}/edit', [EmployeeController::class, 'edit'])->name('edit');
-    Route::put('{id}', [EmployeeController::class, 'update'])->name('update');
-    Route::delete('{id}', [EmployeeController::class, 'destroy'])->name('destroy');
+        Route::get('/', [EmployeeController::class, 'index'])->name('index');
+        Route::get('/create', [EmployeeController::class, 'create'])->name('create');
+        Route::post('/', [EmployeeController::class, 'store'])->name('store');
+        Route::get('{id}', [EmployeeController::class, 'show'])->name('show');
+        Route::get('{id}/edit', [EmployeeController::class, 'edit'])->name('edit');
+        Route::put('{id}', [EmployeeController::class, 'update'])->name('update');
+        Route::delete('{id}', [EmployeeController::class, 'destroy'])->name('destroy');
 
-    // Joining
-    Route::get('{id}/joining', [EmployeeController::class, 'joining'])->name('joining');
-    Route::post('{id}/joining', [EmployeeController::class, 'storeJoining'])->name('joining.store');
+        // Joining
+        Route::get('{id}/joining', [EmployeeController::class, 'joining'])->name('joining');
+        Route::post('{id}/joining', [EmployeeController::class, 'storeJoining'])->name('joining.store');
 
-    // Salary
-    Route::get('{id}/salaries', [EmployeeController::class, 'salaryHistory'])->name('salaries');
-    Route::post('{id}/salaries', [EmployeeController::class, 'storeSalary'])->name('salaries.store');
+        // Salary
+        Route::get('{id}/salaries', [EmployeeController::class, 'salaryHistory'])->name('salaries');
+        Route::post('{id}/salaries', [EmployeeController::class, 'storeSalary'])->name('salaries.store');
 
-    // Department history
-    Route::get('{id}/departments', [EmployeeController::class, 'departmentHistory'])->name('departments');
-    Route::post('{id}/departments', [EmployeeController::class, 'storeDepartmentAssignment'])->name('departments.store');
-});
+        // Department history
+        Route::get('{id}/departments', [EmployeeController::class, 'departmentHistory'])->name('departments');
+        Route::post('{id}/departments', [EmployeeController::class, 'storeDepartmentAssignment'])->name('departments.store');
+
+
+        
+        
+    });
+    Route::resource('hr/departments', DepartmentController::class)->names('hr.departments');
 
 
 // Route::prefix('hr')->group(function () {

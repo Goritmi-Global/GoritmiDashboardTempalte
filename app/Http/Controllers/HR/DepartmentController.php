@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
+use App\Models\Department;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class DepartmentController extends Controller
 {
@@ -12,15 +14,11 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $departments = Department::latest()->get();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return Inertia::render('HR/Departments/Index', [
+            'departments' => $departments,
+        ]);
     }
 
     /**
@@ -28,38 +26,43 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'code' => 'nullable|string|max:50',
+            'description' => 'nullable|string',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        Department::create($validated);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        return redirect()->route('hr.departments.index')->with('success', 'Department created successfully.');
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $department = Department::findOrFail($id);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'code' => 'nullable|string|max:50',
+            'description' => 'nullable|string',
+        ]);
+
+        $department->update($validated);
+
+        return redirect()->route('hr.departments.index')->with('success', 'Department updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $department = Department::findOrFail($id);
+        $department->delete();
+
+        return redirect()->route('hr.departments.index')->with('success', 'Department deleted successfully.');
     }
 }
