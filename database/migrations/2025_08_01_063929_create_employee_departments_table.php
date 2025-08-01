@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('assigned_at')->useCurrent();
             $table->text('remarks')->nullable();
             $table->foreignId('transferred_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamps();
         }); 
     }
 

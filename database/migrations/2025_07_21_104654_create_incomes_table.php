@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('income_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('account_id')->constrained()->onDelete('cascade');
             $table->string('receipt_no')->nullable();
-            $table->string('receipt_image')->nullable();
+            $table->unsignedBigInteger('receipt_image')->nullable();
+            $table->foreign('receipt_image')->references('id')->on('uploads')->nullOnDelete();
+
             $table->timestamps();
         });
     }
