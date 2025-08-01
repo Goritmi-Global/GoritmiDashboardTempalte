@@ -52,14 +52,12 @@
                 />
 
                 <NavItem
-  icon="chart-bar"
-  text="Reports"
-  href="/accounting/reports"
-  :active="route().current('accounting.reports.index')"
-  small
-/>
-
-
+                    icon="chart-bar"
+                    text="Reports"
+                    href="/accounting/reports"
+                    :active="route().current('accounting.reports.index')"
+                    small
+                />
 
                 <NavItem
                     icon="credit-card"
@@ -98,6 +96,37 @@
                     small
                 />
             </DisclosureItem>
+
+            <!-- HR Section -->
+            <div class="pt-4">
+                <p
+                    class="text-xs text-white/60 uppercase tracking-widest mb-1 px-2"
+                >
+                    HR
+                </p>
+                <DisclosureItem
+                    icon="building-office"
+                    text="HR"
+                    :open="hrOpen"
+                    @toggle="hrOpen = !hrOpen"
+                    :active="isHRActive"
+                >
+                    <NavItem
+                        icon="building-office-2"
+                        text="Departments"
+                        href="/hr/departments"
+                        :active="route().current('hr.departments.index')"
+                        small
+                    />
+                    <NavItem
+                        icon="users"
+                        text="Employees"
+                        href="/hr/employees"
+                        :active="route().current('hr.employees.index')"
+                        small
+                    />
+                </DisclosureItem>
+            </div>
 
             <NavItem
                 icon="user-group"
@@ -227,8 +256,17 @@ const accountingOpen = ref(
         route().current("accounting.cashbooks.index") ||
         route().current("accounting.forecasting") ||
         route().current("accounting.reports.index")
-        
+);
+const isAccountingActive = computed(() => accountingOpen.value);
+
+const hrOpen = ref(
+    route().current("hr.departments.index") ||
+        route().current("hr.employees.index")
 );
 
-const isAccountingActive = computed(() => accountingOpen.value);
+const isHRActive = computed(
+    () =>
+        route().current("hr.departments.index") ||
+        route().current("hr.employees.index")
+);
 </script>

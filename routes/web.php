@@ -24,6 +24,11 @@ use App\Http\Controllers\Accounting\{
     ReportController
 };
 
+use App\Http\Controllers\HR\{
+    DepartmentController,
+    EmployeeController
+};
+ 
 Route::resource('expense-types', ExpenseTypeController::class);
 Route::resource('income-types', IncomeTypeController::class);
 Route::resource('expenses', ExpenseController::class);
@@ -141,6 +146,15 @@ Route::get('forecasting', [ReportController::class, 'generateMonthlyExpenseForec
 
 
     });
+
+
+    
+
+Route::prefix('hr')->group(function () {
+    Route::resource('departments', DepartmentController::class);
+    Route::resource('employees', EmployeeController::class);
+});
+
 
 
 
