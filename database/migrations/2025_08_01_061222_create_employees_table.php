@@ -13,18 +13,23 @@ return new class extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('department_id')->constrained()->onDelete('cascade');
+            $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
             $table->string('name');
+            $table->string('designation')->nullable();
             $table->string('contact')->nullable();
             $table->string('nationality')->nullable();
             $table->string('nic')->unique();
             $table->date('dob')->nullable();
             $table->text('address')->nullable();
-            $table->string('photo')->nullable(); // store image path
+            $table->string('photo')->nullable();
             $table->enum('gender', ['male', 'female', 'other'])->nullable();
+            $table->enum('marital_status', ['single', 'married', 'divorced', 'widowed'])->nullable();
             $table->string('email')->unique()->nullable();
+            $table->enum('status', ['active', 'on_leave', 'resigned', 'terminated'])->default('active');
             $table->timestamps();
         });
+
+
     }
 
     /**
